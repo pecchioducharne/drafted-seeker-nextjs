@@ -1,0 +1,389 @@
+[
+  {
+    "email": "demo@yc.com",
+    "name": "Andrew Kozlovski",
+    "university": "University of Southern California",
+    "major": "International Business",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "devsmashcode@gmail.com",
+    "name": "Smash Code",
+    "university": "Nebraska College of Technical Agriculture",
+    "major": "Accounting",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "donaldtrump@gmail.com",
+    "name": "Donald Trump",
+    "university": "New York Law School",
+    "major": "Political Science",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "dsn26@miami.edu",
+    "name": "Douglas Neese",
+    "university": "University of Miami",
+    "major": "Finance",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "hanszimmer@usc.edu",
+    "name": "Hans Zimmer",
+    "university": "University of Southern California",
+    "major": "Music",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "nara8692@colorado.edu",
+    "name": "Nalme Ramadevanahally",
+    "university": "University of Colorado at Boulder",
+    "major": "",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "pecchio@harvard.com",
+    "name": "Rodrigo Gonzalez",
+    "university": "Haven University",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "pecchio@usf.edu",
+    "name": "francisco braschi",
+    "university": "University of South Florida",
+    "major": "braschi",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "posthogtest@gmail.com",
+    "name": "Posthog Tester",
+    "university": "Notre Dame College",
+    "major": "Communications",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "testaugust@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Aerospace Engineering",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "testbeta@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Business",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "testjuly24@gmail.com",
+    "name": "Don Johnson",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "testjuly@usc.edu",
+    "name": "Testg Gmail",
+    "university": "University of Southern California",
+    "major": "Aerospace Engineering",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "testmarch4@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Computer Science",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "wotofa8555@foraro.com",
+    "name": "hhH HH",
+    "university": "hhh",
+    "major": "",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": false
+  },
+  {
+    "email": "0hanszimmer@gmail.com",
+    "name": "Hans Zimmer",
+    "university": "Florida International University",
+    "major": "Music",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "alefeld@gmail.com",
+    "name": "Andres Lef",
+    "university": "University of Southern California",
+    "major": "Business",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "alejandro@gmail.com",
+    "name": "Alejandro Sainz",
+    "university": "University of Southern California",
+    "major": "Business",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "anakin@gmail.com",
+    "name": "Anakin Skywalker",
+    "university": "Rutgers University-Camden",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "cangelr@udd.cl",
+    "name": "cesar Angel",
+    "university": "Universidad del Desarrollo",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "darthvader@gmail.com",
+    "name": "Darth Vader",
+    "university": "Boston University",
+    "major": "Accounting",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "eyetest@gmail.com",
+    "name": "Helen Smith",
+    "university": "University of California-Los Angeles",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "fallout@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Computer Science",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "firefoxtest@gmail.com",
+    "name": "Firefox Test",
+    "university": "University of Southern California",
+    "major": "Accounting",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "horaciothebulldog@gmail.com",
+    "name": "Horacio Bulldog",
+    "university": "Rutgers University-Newark",
+    "major": "Computer Science",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "pecchiocristal@gmail.com",
+    "name": "Draynor Fangalord",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "rodecker@usc.edu",
+    "name": "shane rodecker",
+    "university": "University of Southern California",
+    "major": "business",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "rodrigopecchio@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "rserralta03@gmail.com",
+    "name": "Rebeca Serralta",
+    "university": "Florida International University",
+    "major": "Computer Science",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "student2@gmail.com",
+    "name": "Rodrigo Pecchio",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "student@usc.edu",
+    "name": "Student Albatross",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "supertest@gmail.com",
+    "name": "Rodrigo Test",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "testaug26@gmail.com",
+    "name": "Rodric Draynor",
+    "university": "Charleston School of Law",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "testfirefox@gmail.com",
+    "name": "Firefox Test",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "tropical@gmail.com",
+    "name": "Bowser Nation",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "wesleysnipes@gmail.com",
+    "name": "Wesley Snipes",
+    "university": "University of Southern California",
+    "major": "Accounting",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "yoda@usc.edu",
+    "name": "Master Yoda",
+    "university": "University of Southern California",
+    "major": "Astronomy",
+    "hasVideo1": true,
+    "hasVideo2": true,
+    "hasVideo3": false
+  },
+  {
+    "email": "andrew@fiu.com",
+    "name": "Andrew Koz",
+    "university": "Florida International University",
+    "major": "International Business",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  },
+  {
+    "email": "ansh@caltech.edu",
+    "name": "Ansh Tiwari",
+    "university": "California Institute of Technology",
+    "major": "",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  },
+  {
+    "email": "beetlejuice@gmail.com",
+    "name": "Beetlejuice Examper",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  },
+  {
+    "email": "kamilakaram98@gmail.com",
+    "name": "Kamila  Karam",
+    "university": "University of Miami",
+    "major": "Psychology ",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  },
+  {
+    "email": "shayanmahmood234@gmail.com",
+    "name": "hhH HH",
+    "university": "hhh",
+    "major": "shayan",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  },
+  {
+    "email": "solaristest@gmail.com",
+    "name": "Solaris Tenant",
+    "university": "University of Southern California",
+    "major": "Business Administration",
+    "hasVideo1": true,
+    "hasVideo2": false,
+    "hasVideo3": true
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "origin": ["https://candidate.joindrafted.com", "http://localhost:3000"],
+    "responseHeader": ["Content-Type", "Accept-Ranges", "Content-Length", "Access-Control-Allow-Origin"],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "maxAgeSeconds": 3600
+  }
+]
+
+
+
+
+
+
+
+
+
+
+
+
+

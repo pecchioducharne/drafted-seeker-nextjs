@@ -1,42 +1,173 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    color-scheme: dark;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: white;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+@layer components {
+  /* Drafted Background System */
+  .drafted-background {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  }
+  
+  .drafted-bg-animated {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  
+  .drafted-bg-animated::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 24rem;
+    height: 24rem;
+    background: linear-gradient(45deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+    border-radius: 50%;
+    filter: blur(3rem);
+    animation: drafted-pulse 3s ease-in-out infinite;
+  }
+  
+  .drafted-bg-animated::after {
+    content: '';
+    position: absolute;
+    bottom: 25%;
+    right: 25%;
+    width: 20rem;
+    height: 20rem;
+    background: linear-gradient(45deg, rgba(20, 184, 166, 0.1), rgba(34, 197, 94, 0.1));
+    border-radius: 50%;
+    filter: blur(3rem);
+    animation: drafted-pulse 3s ease-in-out infinite 1s;
+  }
+  
+  /* Drafted Buttons */
+  .drafted-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+  }
+  
+  .drafted-btn-primary {
+    background: linear-gradient(to right, #22c55e, #10b981);
+    color: white;
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+  }
+  
+  .drafted-btn-primary:hover {
+    box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4);
+    transform: scale(1.05);
+  }
+  
+  .drafted-btn-primary-glow {
+    background: linear-gradient(to right, #22c55e, #10b981);
+    color: white;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .drafted-btn-primary-glow:hover {
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
+    transform: scale(1.05);
+  }
+  
+  .drafted-btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  .drafted-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .drafted-btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+  }
+  
+  /* Drafted Cards */
+  .drafted-card {
+    background: linear-gradient(to bottom right, rgba(31, 41, 55, 0.4), rgba(17, 24, 39, 0.4));
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Drafted Text Utilities */
+  .drafted-text-gradient {
+    background: linear-gradient(to right, #60a5fa, #34d399, #10b981);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .drafted-text-small {
+    font-size: 0.875rem;
+    color: #d1d5db;
+  }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+@keyframes drafted-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.8);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 60px rgba(0, 255, 136, 1);
   }
 }
