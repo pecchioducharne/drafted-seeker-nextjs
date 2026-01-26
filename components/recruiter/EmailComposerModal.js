@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, Send, Loader2, Check, AlertCircle } from 'lucide-react';
 import ReactModal from 'react-modal';
-import { sendGmailEmail, getGmailQuotaStatus } from '../../lib/gmail/gmailUtils';
+import { getGmailQuotaStatus } from '../../lib/gmail/gmailUtils';
 import { generateEmailSubject, generateHtmlEmail } from '../../lib/gmail/emailUtils';
-import { MESSAGE_VARIATIONS } from '../../lib/gmail/constants';
+import { sendSingleNudge, canNudgeCompany } from '../../lib/services/nudgeService';
 
 // Set app element for react-modal accessibility
 if (typeof window !== 'undefined') {
@@ -25,17 +25,32 @@ export default function EmailComposerModal({
 }) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-  const [sendStatus, setSendStatus] = useState('idle'); // idle, authenticating, sending, sent, error
+  const [sendStatus, setSendStatus] = useState('idle'); // idle, checking, authenticating, sending, sent, error
   const [error, setError] = useState(null);
   const [quotaStatus, setQuotaStatus] = useState(null);
+  const [cooldownWarning, setCooldownWarning] = useState(null);
 
-  // Generate email content when modal opens
+  // Generate email content and check cooldown when modal opens
   useEffect(() => {
     if (isOpen && company && userData) {
       generateEmailContent();
       setQuotaStatus(getGmailQuotaStatus());
+      checkCooldown();
     }
   }, [isOpen, company, userData]);
+
+  const checkCooldown = async () => {
+    if (!company || !userData) return;
+    
+    const companyName = company.Company || company.name || 'Company';
+    const cooldownCheck = await canNudgeCompany(userData.email, companyName);
+    
+    if (!cooldownCheck.canNudge) {
+      setCooldownWarning(cooldownCheck.reason);
+    } else {
+      setCooldownWarning(null);
+    }
+  };
 
   const generateEmailContent = () => {
     if (!userData || !company) return;
@@ -56,30 +71,39 @@ export default function EmailComposerModal({
       return;
     }
 
-    setSendStatus('idle');
     setError(null);
+    
+    const recipientEmail = company.Email.split(',')[0].trim();
+    const companyName = company.Company || company.name || 'Company';
 
-    const result = await sendGmailEmail({
-      recipient: company.Email.split(',')[0].trim(),
-      subject,
-      body,
-      company: company.Company,
-      onProgress: (status) => setSendStatus(status)
+    // Use the nudge service which handles cooldown, unsubscribe, and recording
+    const result = await sendSingleNudge({
+      company: { Company: companyName, Email: recipientEmail },
+      recipientEmail,
+      userData,
+      onProgress: (status) => setSendStatus(status),
+      onSuccess: (result) => {
+        setSendStatus('sent');
+        setQuotaStatus(getGmailQuotaStatus());
+        onEmailSent?.({ ...result, company: companyName });
+        
+        // Close modal after short delay
+        setTimeout(() => {
+          onClose();
+          setSendStatus('idle');
+          setError(null);
+          setCooldownWarning(null);
+        }, 2000);
+      },
+      onError: (error) => {
+        setSendStatus('error');
+        setError(error);
+      }
     });
 
-    if (result.success) {
-      setSendStatus('sent');
-      setQuotaStatus(getGmailQuotaStatus());
-      onEmailSent?.(result);
-      
-      // Close modal after short delay
-      setTimeout(() => {
-        onClose();
-        setSendStatus('idle');
-      }, 2000);
-    } else {
+    if (!result.success && result.error) {
       setSendStatus('error');
-      setError(result.error || result.message || 'Failed to send email');
+      setError(result.error);
     }
   };
 
@@ -128,6 +152,17 @@ export default function EmailComposerModal({
           <p className="text-gray-400 text-center">
             Your nudge has been sent to {company?.Company}
           </p>
+        </div>
+      )}
+
+      {/* Cooldown Warning */}
+      {cooldownWarning && sendStatus !== 'sent' && (
+        <div className="mb-6 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-yellow-400 font-medium">Cooldown Active</p>
+            <p className="text-sm text-yellow-400/80 mt-1">{cooldownWarning}</p>
+          </div>
         </div>
       )}
 
@@ -193,9 +228,15 @@ export default function EmailComposerModal({
             </button>
             <button
               onClick={handleSend}
-              disabled={sendStatus === 'authenticating' || sendStatus === 'sending' || !company?.Email}
+              disabled={sendStatus === 'checking' || sendStatus === 'authenticating' || sendStatus === 'sending' || !company?.Email || cooldownWarning}
               className="flex-1 drafted-btn drafted-btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-50"
             >
+              {sendStatus === 'checking' && (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Checking...
+                </>
+              )}
               {sendStatus === 'authenticating' && (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -211,7 +252,7 @@ export default function EmailComposerModal({
               {(sendStatus === 'idle' || sendStatus === 'error') && (
                 <>
                   <Send className="w-5 h-5" />
-                  Send Email
+                  {cooldownWarning ? 'Cooldown Active' : 'Send Email'}
                 </>
               )}
             </button>
