@@ -68,9 +68,9 @@ const InfoBlob = ({ onProfileUpdate }) => {
   const profileData = authProfileData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Profile Header */}
-      <div className="drafted-card">
+      <div className="drafted-card liquid-glass">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">

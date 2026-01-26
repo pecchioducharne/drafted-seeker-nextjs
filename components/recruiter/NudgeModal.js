@@ -163,11 +163,12 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
     <ReactModal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="max-w-4xl mx-auto mt-10 bg-gradient-to-br from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
-      overlayClassName="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start justify-center z-50 overflow-y-auto pt-10 pb-10"
+      className="max-w-4xl mx-auto mt-10 liquid-glass rounded-2xl p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+      overlayClassName="fixed inset-0 bg-black/60 backdrop-blur-md flex items-start justify-center z-50 overflow-y-auto pt-10 pb-10"
       style={{
         content: {
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(17, 24, 39, 0.95) 50%, rgba(31, 41, 55, 0.95) 100%)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)',
         }
       }}
     >

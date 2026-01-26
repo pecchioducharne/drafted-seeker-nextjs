@@ -90,7 +90,7 @@ const CommunityStories = ({ showJasonsStory = true, maxStories = 5 }) => {
 
   return (
     <>
-      <div className="drafted-card">
+      <div className="drafted-card liquid-glass">
         {showJasonsStory && (
           <div className="mb-6 pb-6 border-b border-white/10">
             <h3 className="text-lg font-semibold text-white mb-3">Success Story</h3>
