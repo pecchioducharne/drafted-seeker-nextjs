@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { normalizeLocation, normalizeLocationType, getConsolidatedLocations } from '../../lib/utils/locationUtils';
-import EmailComposerModal from '../../components/recruiter/EmailComposerModal';
+import NudgeModal from '../../components/recruiter/NudgeModal';
 import dataJobsData from '../../superannotate_jobs_20260121_180210.json';
 
 // SuperAnnotate referral link for all data jobs
@@ -830,7 +830,7 @@ export default function RecruiterPage() {
       </div>
       
       {/* Email Composer Modal */}
-      <EmailComposerModal
+      <NudgeModal
         isOpen={showEmailComposer}
         onClose={() => {
           setShowEmailComposer(false);
