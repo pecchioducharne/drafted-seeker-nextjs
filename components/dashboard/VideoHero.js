@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { auth, db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { PlayCircle, Video } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const videoData = [
   {
@@ -52,17 +53,38 @@ export default function VideoHero({ major }) {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          setVideoUrls({
+          const videos = {
             video1: userData.video1 || '',
             video2: userData.video2 || '',
             video3: userData.video3 || ''
-          });
+          };
+          
+          setVideoUrls(videos);
           
           setVideoMetadata({
             video1: { isExternalLink: userData.video1IsExternalLink || false },
             video2: { isExternalLink: userData.video2IsExternalLink || false },
             video3: { isExternalLink: userData.video3IsExternalLink || userData.isScreenRecordingLink || false }
           });
+
+          // Show encouraging messages based on progress
+          const videoCount = Object.values(videos).filter(v => v).length;
+          if (videoCount === 1 && !sessionStorage.getItem('video1_toast_shown')) {
+            setTimeout(() => {
+              toast.success("Hell yeah! First video down. Two more and you're unstoppable.", { duration: 5000 });
+              sessionStorage.setItem('video1_toast_shown', 'true');
+            }, 1000);
+          } else if (videoCount === 2 && !sessionStorage.getItem('video2_toast_shown')) {
+            setTimeout(() => {
+              toast.success("You're on fire! One more video and recruiters won't know what hit them.", { duration: 5000 });
+              sessionStorage.setItem('video2_toast_shown', 'true');
+            }, 1000);
+          } else if (videoCount === 3 && !sessionStorage.getItem('video3_toast_shown')) {
+            setTimeout(() => {
+              toast.success("🔥 All three videos done! Now go find some companies and start nudging.", { duration: 6000 });
+              sessionStorage.setItem('video3_toast_shown', 'true');
+            }, 1000);
+          }
         }
       }
     };
@@ -120,15 +142,18 @@ export default function VideoHero({ major }) {
             <p className="text-gray-400 text-sm sm:text-base mb-4">
               {currentVideoData.description}
             </p>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-500 text-sm mb-2">
               {currentVideoData.duration}
+            </p>
+            <p className="text-drafted-green text-sm mb-6 font-medium">
+              {currentVideo === 0 ? "Let's make you unforgettable" : currentVideo === 1 ? "Show them what you're made of" : "Time to flex a little"}
             </p>
             <button
               onClick={() => handleRecordClick(currentVideo + 1)}
               className="drafted-btn drafted-btn-primary px-6 sm:px-8 py-3 flex items-center gap-2"
             >
               <Video className="w-5 h-5" />
-              Record Video
+              {currentVideo === 0 ? "Start Your Story" : "Record This One"}
             </button>
           </div>
         )}

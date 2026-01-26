@@ -78,7 +78,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
     navigator.clipboard.writeText(companyEmail);
     setShowEmailCopied(true);
     setTimeout(() => setShowEmailCopied(false), 2000);
-    toast.success('Copied company email!');
+    toast.success('Got it! Email copied to clipboard.');
   };
 
   const handleCopyProfile = () => {
@@ -86,7 +86,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
     navigator.clipboard.writeText(profileLink);
     setShowProfileCopied(true);
     setTimeout(() => setShowProfileCopied(false), 2000);
-    toast.success('Copied profile link!');
+    toast.success('Profile link copied. Share it anywhere!');
   };
 
   const handleCopyMessage = () => {
@@ -94,7 +94,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
     navigator.clipboard.writeText(plainText);
     setShowMessageCopied(true);
     setTimeout(() => setShowMessageCopied(false), 2000);
-    toast.success('Copied email message!');
+    toast.success('Message copied! Paste it wherever you want.');
   };
 
   const handleCopyLinkedInDM = () => {
@@ -102,7 +102,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
     navigator.clipboard.writeText(dm);
     setShowDMCopied(true);
     setTimeout(() => setShowDMCopied(false), 2000);
-    toast.success('Copied LinkedIn DM!');
+    toast.success('LinkedIn DM ready to go. Slide into those DMs!');
   };
 
   const handleLinkedInSearch = () => {
@@ -184,10 +184,10 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-2">
-          Send nudge to {companyName}
+          Let's get {companyName}'s attention
         </h2>
         <p className="text-sm text-gray-400">
-          Reach out with a personalized message and your video profile
+          Your video + this message = unforgettable first impression
         </p>
       </div>
 

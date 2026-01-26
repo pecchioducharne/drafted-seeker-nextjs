@@ -38,12 +38,12 @@ export default function ProfileSnapshot() {
         }
         await updateDoc(userDocRef, dataToUpdate);
         setIsEditing(false);
-        toast.success('Profile updated!');
+        toast.success('Profile looking sharp! Now go show it off.', { duration: 4000 });
         if (refreshProfile) await refreshProfile();
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      toast.error('Hmm, that didn\'t work. Give it another shot?');
     }
   };
 
@@ -58,12 +58,12 @@ export default function ProfileSnapshot() {
       if (user) {
         const userDocRef = doc(db, 'drafted-accounts', user.email.toLowerCase());
         await updateDoc(userDocRef, { skills });
-        toast.success('Skills updated!');
+        toast.success('Skills locked in! Recruiters are gonna eat this up.', { duration: 4000 });
         if (refreshProfile) await refreshProfile();
       }
     } catch (error) {
       console.error('Error updating skills:', error);
-      toast.error('Failed to update skills');
+      toast.error('Oops, something went wrong. Try again?');
     }
   };
 

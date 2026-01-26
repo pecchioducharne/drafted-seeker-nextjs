@@ -272,7 +272,15 @@ export default function RecruiterPage() {
   
   // Handle email sent successfully
   const handleEmailSent = useCallback((result) => {
-    toast.success(`Email sent to ${result.company}!`, { duration: 3000 });
+    const messages = [
+      `Boom! ${result.company} just got your nudge. They're gonna love you.`,
+      `Nice! Email sent to ${result.company}. Now sit back and let them come to you.`,
+      `${result.company} is about to see what they've been missing. Well done.`,
+      `Nudge sent! ${result.company} better check their inbox. You're on fire.`,
+      `Hell yeah! ${result.company} just got introduced to their next hire.`
+    ];
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    toast.success(randomMessage, { duration: 4000 });
   }, []);
 
   if (authLoading || loading) {
@@ -299,6 +307,17 @@ export default function RecruiterPage() {
     setSelectedRoles([]);
   };
 
+  // Get favicon URL for a company website
+  const getFavicon = (url) => {
+    if (!url) return null;
+    try {
+      const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    } catch {
+      return null;
+    }
+  };
+
   const getSourceBadge = (source) => {
     if (source === 'yc') {
       return (
@@ -313,6 +332,18 @@ export default function RecruiterPage() {
         <span className="px-2 py-0.5 text-xs rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
           a16z
         </span>
+      );
+    }
+    return null;
+  };
+
+  const getYCBadge = (company) => {
+    // Only show YC badge if explicitly marked as YC company
+    if (company['Y Combinator'] === 'Yes' || company.yc === 'Yes') {
+      return (
+        <div className="flex items-center justify-center w-6 h-6 rounded bg-orange-500/10 border border-orange-500/20" title="Y Combinator">
+          <img src={YC_LOGO_URL} alt="YC" className="w-4 h-4" />
+        </div>
       );
     }
     return null;
@@ -334,9 +365,9 @@ export default function RecruiterPage() {
             ← Back to Dashboard
           </button>
           
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">Find Your Dream Job</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">Time to Get Hired</h1>
           <p className="text-sm sm:text-base text-gray-400">
-            Browse {companies.length.toLocaleString()}+ companies and {filteredDataJobs.length}+ data annotation jobs
+            {companies.length.toLocaleString()}+ companies waiting to meet you. Let's make some noise.
           </p>
         </div>
 
@@ -521,12 +552,25 @@ export default function RecruiterPage() {
                     className="drafted-card hover:scale-[1.02] transition-transform duration-200"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-white mb-1 line-clamp-1">
-                          {company.Company}
-                        </h3>
-                        {getSourceBadge(company.source)}
+                      <div className="flex items-start gap-3 flex-1">
+                        {/* Company Favicon */}
+                        {company.Website && getFavicon(company.Website) && (
+                          <img 
+                            src={getFavicon(company.Website)} 
+                            alt="" 
+                            className="w-8 h-8 rounded flex-shrink-0 mt-0.5"
+                            onError={(e) => e.target.style.display = 'none'}
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-semibold text-white mb-1 line-clamp-1">
+                            {company.Company}
+                          </h3>
+                          {getSourceBadge(company.source)}
+                        </div>
                       </div>
+                      {/* YC Badge - only if actually YC */}
+                      {getYCBadge(company)}
                     </div>
 
                     {company.Description && (
