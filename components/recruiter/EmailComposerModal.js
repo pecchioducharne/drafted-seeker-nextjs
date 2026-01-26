@@ -186,7 +186,7 @@ export default function EmailComposerModal({
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-400 mb-2">To</label>
             <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-300">
-              {company?.Email?.split(',')[0]?.trim() || 'No email available'}
+              {company?.Email ? (typeof company.Email === 'string' ? company.Email : String(company.Email)).split(',')[0].trim() : 'No email available'}
             </div>
           </div>
 
