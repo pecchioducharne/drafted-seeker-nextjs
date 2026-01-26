@@ -73,7 +73,9 @@ export default function EmailComposerModal({
 
     setError(null);
     
-    const recipientEmail = company.Email.split(',')[0].trim();
+    // Handle Email as string or array
+    const emailStr = typeof company.Email === 'string' ? company.Email : String(company.Email);
+    const recipientEmail = emailStr.split(',')[0].trim();
     const companyName = company.Company || company.name || 'Company';
 
     // Use the nudge service which handles cooldown, unsubscribe, and recording
