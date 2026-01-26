@@ -71,30 +71,32 @@ const InfoBlob = ({ onProfileUpdate }) => {
     <div className="space-y-4 sm:space-y-6">
       {/* Profile Header */}
       <div className="drafted-card liquid-glass">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-3xl font-bold text-white">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white truncate">
                 {profileData.firstName} {profileData.lastName}
               </h2>
-              <button
-                onClick={handleEditClick}
-                className={`px-4 py-2 rounded-lg transition-all ${
-                  isEditing 
-                    ? 'bg-drafted-green text-white hover:bg-drafted-emerald' 
-                    : 'bg-drafted-green/8 hover:bg-drafted-green/15 border border-drafted-green/20 text-drafted-green'
-                }`}
-              >
-                {isEditing ? 'Save' : 'Edit'}
-              </button>
-              {isEditing && (
+              <div className="flex items-center gap-2 flex-shrink-0">
                 <button
-                  onClick={handleCancel}
-                  className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 transition-all"
+                  onClick={handleEditClick}
+                  className={`px-3 sm:px-4 py-2 rounded-lg transition-all text-sm sm:text-base whitespace-nowrap ${
+                    isEditing 
+                      ? 'bg-drafted-green text-white hover:bg-drafted-emerald' 
+                      : 'bg-drafted-green/8 hover:bg-drafted-green/15 border border-drafted-green/20 text-drafted-green'
+                  }`}
                 >
-                  Cancel
+                  {isEditing ? 'Save' : 'Edit'}
                 </button>
-              )}
+                {isEditing && (
+                  <button
+                    onClick={handleCancel}
+                    className="px-3 sm:px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 transition-all text-sm sm:text-base whitespace-nowrap"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2 text-gray-400 text-sm">
               <Email sx={{ fontSize: 16 }} />
