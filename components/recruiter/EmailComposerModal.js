@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, Send, Loader2, Check, AlertCircle } from 'lucide-react';
 import ReactModal from 'react-modal';
 import { sendGmailEmail, getGmailQuotaStatus } from '../../lib/gmail/gmailUtils';
+import { generateEmailSubject, generateHtmlEmail } from '../../lib/gmail/emailUtils';
 import { MESSAGE_VARIATIONS } from '../../lib/gmail/constants';
 
 // Set app element for react-modal accessibility
@@ -37,43 +38,16 @@ export default function EmailComposerModal({
   }, [isOpen, company, userData]);
 
   const generateEmailContent = () => {
-    const firstName = userData?.firstName || 'Candidate';
-    const lastName = userData?.lastName || '';
-    const university = userData?.university || 'my university';
-    const major = userData?.major || 'my field';
-    const companyName = company?.Company || 'your company';
+    if (!userData || !company) return;
 
-    // Generate subject
-    const subjectLine = `${firstName} ${lastName} - Interested in ${companyName}`;
-    setSubject(subjectLine);
+    // Use the professional email template generation
+    const companyName = company.Company || company.name || 'your company';
+    
+    const generatedSubject = generateEmailSubject(userData);
+    const generatedBody = generateHtmlEmail(userData, companyName);
 
-    // Pick a random message variation
-    const variation = MESSAGE_VARIATIONS[Math.floor(Math.random() * MESSAGE_VARIATIONS.length)]
-      .replace('{company}', companyName);
-
-    // Generate body
-    const emailBody = `Hi,
-
-I hope this message finds you well. My name is ${firstName} ${lastName}, and I'm a ${major} student at ${university}.
-
-${variation}
-
-I'm reaching out because I'm genuinely excited about ${companyName}'s mission and would love to explore any opportunities where I could contribute to your team.
-
-You can view my video profile and learn more about me here:
-https://joindrafted.com/profile/${userData?.email || 'profile'}
-
-I'd be grateful for the chance to connect and learn more about how I might be a good fit. Thank you for your time and consideration.
-
-Best regards,
-${firstName} ${lastName}
-${university}
-
---
-This email was sent via Drafted (joindrafted.com)
-A platform connecting students with innovative companies`;
-
-    setBody(emailBody);
+    setSubject(generatedSubject);
+    setBody(generatedBody);
   };
 
   const handleSend = async () => {
