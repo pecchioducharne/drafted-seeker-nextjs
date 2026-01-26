@@ -84,7 +84,7 @@ export default function StepEmail({ data, onNext }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl md:text-6xl font-bold text-white mb-4"
       >
-        Welcome to Drafted ✨
+        Let's get you hired.
       </motion.h1>
 
       <motion.p
@@ -93,7 +93,7 @@ export default function StepEmail({ data, onNext }) {
         transition={{ delay: 0.1 }}
         className="text-gray-400 text-lg mb-12"
       >
-        Let's get you started with your professional journey
+        Rock 'n' roll.
       </motion.p>
 
       <div className="space-y-6">
