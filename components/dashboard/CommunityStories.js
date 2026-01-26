@@ -149,7 +149,7 @@ const CommunityStories = ({ showJasonsStory = true, maxStories = 5 }) => {
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/embed/YZsacN8_-Ew"
             title="Jason's Success Story"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

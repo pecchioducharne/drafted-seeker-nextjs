@@ -4,16 +4,24 @@ import { UserProvider } from '../contexts/UserContext';
 import { UploadingProvider } from '../contexts/UploadingContext';
 import { PostHogProvider } from '../contexts/PostHogContext';
 import { Toaster } from 'react-hot-toast';
+import { Poppins } from 'next/font/google';
+
+const poppins = Poppins({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-poppins',
+});
 
 export const metadata = {
-  title: 'Drafted - Video Resume Platform',
+  title: 'drafted. - Video Resume Platform',
   description: 'Stand out with a 30-second video resume. Connect with thousands of recruiters.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark">
-      <body>
+      <body className={poppins.variable} id="root">
         <PostHogProvider>
           <AuthProvider>
             <UserProvider>

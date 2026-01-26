@@ -6,6 +6,11 @@ import ReactModal from 'react-modal';
 import { sendGmailEmail, getGmailQuotaStatus } from '../../lib/gmail/gmailUtils';
 import { MESSAGE_VARIATIONS } from '../../lib/gmail/constants';
 
+// Set app element for react-modal accessibility
+if (typeof window !== 'undefined') {
+  ReactModal.setAppElement('#root');
+}
+
 /**
  * EmailComposerModal - Email composition for recruiter outreach
  * Pre-fills email with candidate info and company context

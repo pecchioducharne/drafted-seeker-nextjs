@@ -10,11 +10,18 @@ import { Language, Email } from "@mui/icons-material";
 import ReactModal from 'react-modal';
 import toast from 'react-hot-toast';
 import { useAuth } from "../../contexts/AuthContext";
+import SkillSelector from "./SkillSelector";
+
+// Set app element for react-modal
+if (typeof window !== 'undefined') {
+  ReactModal.setAppElement('#root');
+}
 
 const InfoBlob = ({ onProfileUpdate }) => {
   const { profileData: authProfileData, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({});
+  const [showSkillSelector, setShowSkillSelector] = useState(false);
 
   useEffect(() => {
     if (authProfileData) {
@@ -146,7 +153,15 @@ const InfoBlob = ({ onProfileUpdate }) => {
 
         {/* Skills */}
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Skills</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Skills</h3>
+            <button
+              onClick={() => setShowSkillSelector(true)}
+              className="text-xs text-drafted-green hover:text-drafted-emerald transition-colors"
+            >
+              Edit Skills
+            </button>
+          </div>
           <div className="flex flex-wrap gap-2">
             {profileData.skills && profileData.skills.length > 0 ? (
               profileData.skills.map((skill, index) => (
@@ -325,20 +340,6 @@ const InfoBlob = ({ onProfileUpdate }) => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Skills (comma separated)</label>
-            <textarea
-              value={(editedData.skills || []).join(', ')}
-              onChange={(e) => {
-                const skillsArray = e.target.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
-                setEditedData({...editedData, skills: skillsArray});
-              }}
-              placeholder="JavaScript, React, Python, Data Analysis..."
-              rows={2}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-drafted-green/50 resize-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">Enter your skills separated by commas (max 5 recommended)</p>
-          </div>
         </div>
 
         <div className="flex gap-3 mt-6">
@@ -356,6 +357,28 @@ const InfoBlob = ({ onProfileUpdate }) => {
           </button>
         </div>
       </ReactModal>
+
+      {/* Skill Selector Modal */}
+      <SkillSelector
+        isOpen={showSkillSelector}
+        onClose={() => setShowSkillSelector(false)}
+        initialSkills={profileData.skills || []}
+        onSave={async (skills) => {
+          try {
+            const user = auth.currentUser;
+            if (user) {
+              const userDocRef = doc(db, "drafted-accounts", user.email.toLowerCase());
+              await updateDoc(userDocRef, { skills });
+              toast.success('Skills updated successfully!');
+              if (refreshProfile) await refreshProfile();
+              if (onProfileUpdate) onProfileUpdate();
+            }
+          } catch (error) {
+            console.error('Error updating skills:', error);
+            toast.error('Failed to update skills');
+          }
+        }}
+      />
     </div>
   );
 };
