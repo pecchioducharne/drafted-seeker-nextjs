@@ -19,6 +19,8 @@ export function PostHogProvider({ children }) {
         api_host: apiHost,
         capture_pageview: true,
         autocapture: true,
+        // Disable session recording to avoid rrweb errors
+        disable_session_recording: true,
         loaded: (posthog) => {
           if (process.env.NODE_ENV === 'development') posthog.debug();
         }
@@ -45,5 +47,28 @@ export function usePostHog() {
   if (context === undefined) {
     throw new Error('usePostHog must be used within a PostHogProvider');
   }
-  return context.posthog;
+  
+  // Return a safe wrapper object with common methods
+  return {
+    posthog: context.posthog,
+    isInitialized: context.isInitialized,
+    captureEvent: (eventName, properties) => {
+      if (context.posthog && context.isInitialized) {
+        try {
+          context.posthog.capture(eventName, properties);
+        } catch (error) {
+          console.warn('PostHog capture error:', error);
+        }
+      }
+    },
+    identify: (userId, properties) => {
+      if (context.posthog && context.isInitialized) {
+        try {
+          context.posthog.identify(userId, properties);
+        } catch (error) {
+          console.warn('PostHog identify error:', error);
+        }
+      }
+    }
+  };
 }
