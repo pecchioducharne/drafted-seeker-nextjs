@@ -179,82 +179,103 @@ export default function SkillSelector({ onSave, initialSkills = [], isOpen, onCl
         Choose up to 5 skills that best represent your abilities
       </p>
 
-      <div className="space-y-2 mb-6">
-        {skillsData.map((skill) => (
-          <div key={skill.name}>
-            {/* Main skill button */}
+      {/* Horizontal scrollable skill categories */}
+      <div className="mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          {skillsData.map((skill) => (
             <button
+              key={skill.name}
               onClick={() => handleSkillClick(skill.name)}
-              disabled={isSelectionDisabled(skill.name)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all ${
+              disabled={skill.branches && skill.branches.length > 0 ? false : isSelectionDisabled(skill.name)}
+              className={`px-4 py-2 rounded-lg border text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
                 selectedItems.includes(skill.name)
                   ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
-                  : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-              } ${isSelectionDisabled(skill.name) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  : expandedSkills.has(skill.name)
+                  ? 'bg-white/10 border-white/20 text-white'
+                  : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+              } ${(!skill.branches || skill.branches.length === 0) && isSelectionDisabled(skill.name) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              <span className="font-medium">{skill.name}</span>
-              <div className="flex items-center gap-2">
-                {selectedItems.includes(skill.name) && (
-                  <Check className="w-4 h-4" />
-                )}
-                {skill.branches && skill.branches.length > 0 && (
-                  <ChevronDown 
-                    className={`w-4 h-4 transition-transform ${
-                      expandedSkills.has(skill.name) ? 'rotate-180' : ''
-                    }`}
-                  />
-                )}
-              </div>
+              {skill.name}
+              {selectedItems.includes(skill.name) && (
+                <Check className="w-4 h-4" />
+              )}
+              {skill.branches && skill.branches.length > 0 && (
+                <ChevronDown 
+                  className={`w-3 h-3 transition-transform ${
+                    expandedSkills.has(skill.name) ? 'rotate-180' : ''
+                  }`}
+                />
+              )}
             </button>
-
-            {/* Branches section */}
-            {skill.branches && skill.branches.length > 0 && expandedSkills.has(skill.name) && (
-              <div className="mt-2 ml-4 space-y-2 pb-2">
-                <p className="text-xs text-gray-400 mb-2">
-                  Choose specific {skill.name.toLowerCase()} skills:
-                </p>
-                
-                {/* General option */}
-                <button
-                  onClick={() => handleItemSelection(skill.name)}
-                  disabled={isSelectionDisabled(skill.name)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition-all ${
-                    selectedItems.includes(skill.name)
-                      ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
-                      : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
-                  } ${isSelectionDisabled(skill.name) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <span>{skill.name} (General)</span>
-                  {selectedItems.includes(skill.name) && (
-                    <Check className="w-3 h-3" />
-                  )}
-                </button>
-
-                {/* Branch options */}
-                <div className="grid grid-cols-2 gap-2">
-                  {skill.branches.map((branch) => (
-                    <button
-                      key={branch}
-                      onClick={() => handleItemSelection(branch)}
-                      disabled={isSelectionDisabled(branch)}
-                      className={`flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition-all ${
-                        selectedItems.includes(branch)
-                          ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
-                          : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
-                      } ${isSelectionDisabled(branch) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <span className="truncate">{branch}</span>
-                      {selectedItems.includes(branch) && (
-                        <Check className="w-3 h-3 flex-shrink-0 ml-1" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Expanded skill branches - horizontal layout */}
+      {skillsData.map((skill) => (
+        skill.branches && skill.branches.length > 0 && expandedSkills.has(skill.name) && (
+          <div key={`expanded-${skill.name}`} className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+            <p className="text-sm text-gray-400 mb-3">
+              Choose {skill.name.toLowerCase()} skills:
+            </p>
+            
+            <div className="space-y-2">
+              {/* General option */}
+              <button
+                onClick={() => handleItemSelection(skill.name)}
+                disabled={isSelectionDisabled(skill.name)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border text-sm transition-all ${
+                  selectedItems.includes(skill.name)
+                    ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                    : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                } ${isSelectionDisabled(skill.name) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <span>{skill.name} (General)</span>
+                {selectedItems.includes(skill.name) && (
+                  <Check className="w-3 h-3" />
+                )}
+              </button>
+
+              {/* Horizontal scrollable branch options */}
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                {skill.branches.map((branch) => (
+                  <button
+                    key={branch}
+                    onClick={() => handleItemSelection(branch)}
+                    disabled={isSelectionDisabled(branch)}
+                    className={`px-3 py-2 rounded-lg border text-sm whitespace-nowrap transition-all flex items-center gap-1 ${
+                      selectedItems.includes(branch)
+                        ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                    } ${isSelectionDisabled(branch) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <span>{branch}</span>
+                    {selectedItems.includes(branch) && (
+                      <Check className="w-3 h-3 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      ))}
+      
+      <style jsx>{`
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 6px;
+        }
+        .scrollbar-thumb-white\/10::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+        }
+        .scrollbar-thumb-white\/10::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+        .scrollbar-track-transparent::-webkit-scrollbar-track {
+          background: transparent;
+        }
+      `}</style>
 
       {/* Selected skills preview */}
       {selectedItems.length > 0 && (

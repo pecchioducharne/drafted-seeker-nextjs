@@ -105,7 +105,23 @@ export default function Dashboard() {
                   </svg>
                 </summary>
                 <div className="mt-4 liquid-glass rounded-xl p-6">
-                  <p className="text-gray-400 text-sm">Add your experience, projects, and achievements here.</p>
+                  <div className="space-y-4">
+                    <p className="text-gray-400 text-sm mb-4">
+                      Showcase your best work with a video walkthrough or screen recording.
+                    </p>
+                    <button
+                      onClick={() => router.push('/video-recorder3')}
+                      className="drafted-btn drafted-btn-primary w-full sm:w-auto px-6 py-3 flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Record a Project Demo
+                    </button>
+                    <p className="text-xs text-gray-500">
+                      💡 Tip: You can record your screen to showcase something you've built, or just talk through a project you're proud of.
+                    </p>
+                  </div>
                 </div>
               </details>
             </div>

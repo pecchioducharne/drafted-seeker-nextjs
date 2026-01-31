@@ -8,6 +8,50 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import SkillSelector from './SkillSelector';
+import RoleSelector from './RoleSelector';
+
+// Get university favicon
+const getUniversityFavicon = (universityName) => {
+  if (!universityName) return null;
+  
+  // Map of common universities to their domains
+  const universityDomains = {
+    'stanford': 'stanford.edu',
+    'harvard': 'harvard.edu',
+    'mit': 'mit.edu',
+    'berkeley': 'berkeley.edu',
+    'yale': 'yale.edu',
+    'princeton': 'princeton.edu',
+    'columbia': 'columbia.edu',
+    'upenn': 'upenn.edu',
+    'penn': 'upenn.edu',
+    'cornell': 'cornell.edu',
+    'brown': 'brown.edu',
+    'dartmouth': 'dartmouth.edu',
+    'duke': 'duke.edu',
+    'northwestern': 'northwestern.edu',
+    'uchicago': 'uchicago.edu',
+    'caltech': 'caltech.edu'
+  };
+  
+  const nameLower = universityName.toLowerCase();
+  
+  // Try to find matching domain
+  for (const [key, domain] of Object.entries(universityDomains)) {
+    if (nameLower.includes(key)) {
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    }
+  }
+  
+  // Try to construct domain from university name
+  const cleanName = universityName.toLowerCase()
+    .replace(/university of /gi, '')
+    .replace(/the /gi, '')
+    .replace(/ /g, '')
+    .replace(/[^a-z]/g, '');
+  
+  return `https://www.google.com/s2/favicons?domain=${cleanName}.edu&sz=32`;
+};
 
 export default function ProfileSnapshot() {
   const { profileData, refreshProfile } = useAuth();
@@ -76,12 +120,28 @@ export default function ProfileSnapshot() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 truncate">
               {profileData.firstName} {profileData.lastName}
             </h1>
-            <p className="text-base sm:text-lg text-gray-300">
-              {profileData.major || 'Your Major'} {profileData.university && `@ ${profileData.university}`}
-              {profileData.graduationYear && (
-                <span className="text-gray-400"> • Class of {profileData.graduationYear}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-base sm:text-lg text-gray-300">
+                {profileData.major || 'Your Major'}
+                {profileData.university && (
+                  <>
+                    {' @ '}
+                    {profileData.university}
+                  </>
+                )}
+                {profileData.graduationYear && (
+                  <span className="text-gray-400"> • Class of {profileData.graduationYear}</span>
+                )}
+              </p>
+              {profileData.university && (
+                <img 
+                  src={getUniversityFavicon(profileData.university)} 
+                  alt={profileData.university}
+                  className="w-4 h-4 rounded-sm"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
               )}
-            </p>
+            </div>
           </div>
           
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -235,32 +295,78 @@ export default function ProfileSnapshot() {
             )}
           </div>
 
-          {/* Right: Job Preferences */}
+          {/* Right: Job Preferences & Role */}
           <div className="space-y-4">
             {/* Open To */}
             <div>
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
                 Open To
               </h3>
-              <div className="flex flex-wrap gap-2">
-                <div className={`px-3 py-1.5 rounded-lg border text-sm font-medium ${
-                  profileData.jobType === 'Full-time' || profileData.jobType === 'Both'
-                    ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
-                    : 'bg-white/5 border-white/10 text-gray-400'
-                }`}>
-                  <Briefcase className="w-4 h-4 inline mr-1" />
-                  Full-time
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      const current = editedData.jobType || 'Both';
+                      let newType;
+                      if (current === 'Full-time') newType = 'Both';
+                      else if (current === 'Both') newType = 'Internship';
+                      else newType = 'Full-time';
+                      setEditedData({...editedData, jobType: newType});
+                    }}
+                    className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${
+                      editedData.jobType === 'Full-time' || editedData.jobType === 'Both'
+                        ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                    }`}>
+                    <Briefcase className="w-4 h-4 inline mr-1" />
+                    Full-time
+                  </button>
+                  <button
+                    onClick={() => {
+                      const current = editedData.jobType || 'Both';
+                      let newType;
+                      if (current === 'Internship') newType = 'Both';
+                      else if (current === 'Both') newType = 'Full-time';
+                      else newType = 'Internship';
+                      setEditedData({...editedData, jobType: newType});
+                    }}
+                    className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${
+                      editedData.jobType === 'Internship' || editedData.jobType === 'Both'
+                        ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                        : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                    }`}>
+                    <GraduationCap className="w-4 h-4 inline mr-1" />
+                    Internship
+                  </button>
                 </div>
-                <div className={`px-3 py-1.5 rounded-lg border text-sm font-medium ${
-                  profileData.jobType === 'Internship' || profileData.jobType === 'Both'
-                    ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
-                    : 'bg-white/5 border-white/10 text-gray-400'
-                }`}>
-                  <GraduationCap className="w-4 h-4 inline mr-1" />
-                  Internship
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <div className={`px-3 py-1.5 rounded-lg border text-sm font-medium ${
+                    profileData.jobType === 'Full-time' || profileData.jobType === 'Both'
+                      ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                      : 'bg-white/5 border-white/10 text-gray-400'
+                  }`}>
+                    <Briefcase className="w-4 h-4 inline mr-1" />
+                    Full-time
+                  </div>
+                  <div className={`px-3 py-1.5 rounded-lg border text-sm font-medium ${
+                    profileData.jobType === 'Internship' || profileData.jobType === 'Both'
+                      ? 'bg-drafted-green/10 border-drafted-green/30 text-drafted-green'
+                      : 'bg-white/5 border-white/10 text-gray-400'
+                  }`}>
+                    <GraduationCap className="w-4 h-4 inline mr-1" />
+                    Internship
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
+            
+            {/* Role Selector */}
+            {!isEditing && (
+              <RoleSelector onRoleChange={async () => {
+                if (refreshProfile) await refreshProfile();
+              }} />
+            )}
 
             {/* Skills */}
             <div>

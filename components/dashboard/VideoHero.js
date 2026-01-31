@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, db } from '../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { PlayCircle, Video } from 'lucide-react';
+import { PlayCircle, Video, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import TypingGreeting from './TypingGreeting';
+import { useAuth } from '../../contexts/AuthContext';
 
 const videoData = [
   {
@@ -25,7 +27,7 @@ const videoData = [
   {
     id: 3,
     question: 'Describe a project you\'re proud of',
-    description: 'Highlight your best work and impact',
+    description: 'Highlight your best work and impact. Can include screen recordings!',
     duration: '60 seconds',
     field: 'video3'
   }
@@ -33,6 +35,7 @@ const videoData = [
 
 export default function VideoHero({ major }) {
   const router = useRouter();
+  const { profileData } = useAuth();
   const [currentVideo, setCurrentVideo] = useState(0);
   const [videoUrls, setVideoUrls] = useState({
     video1: '',
@@ -98,11 +101,39 @@ export default function VideoHero({ major }) {
   const currentVideoData = videoData[currentVideo];
   const currentVideoUrl = videoUrls[currentVideoData.field];
   const isExternalLink = videoMetadata[currentVideoData.field]?.isExternalLink;
+  
+  const handlePrevVideo = () => {
+    setCurrentVideo((prev) => (prev === 0 ? videoData.length - 1 : prev - 1));
+  };
+  
+  const handleNextVideo = () => {
+    setCurrentVideo((prev) => (prev === videoData.length - 1 ? 0 : prev + 1));
+  };
 
   return (
-    <div className="liquid-glass rounded-2xl overflow-hidden">
-      {/* Video Player - Full Width Hero */}
-      <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800">
+    <>
+      {/* Typing Greeting */}
+      <TypingGreeting firstName={profileData?.firstName || 'there'} />
+      
+      <div className="liquid-glass rounded-2xl overflow-hidden">
+        {/* Video Player - Full Width Hero with Navigation Arrows */}
+        <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 group">
+          {/* Navigation Arrows */}
+          <button
+            onClick={handlePrevVideo}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Previous video"
+          >
+            <ChevronLeft className="w-6 h-6 text-white" />
+          </button>
+          
+          <button
+            onClick={handleNextVideo}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Next video"
+          >
+            <ChevronRight className="w-6 h-6 text-white" />
+          </button>
         {currentVideoUrl ? (
           isExternalLink ? (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -201,15 +232,15 @@ export default function VideoHero({ major }) {
             const isActive = currentVideo === index;
             
             return (
-              <button
-                key={video.id}
-                onClick={() => setCurrentVideo(index)}
-                className={`w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl transition-all ${
-                  isActive 
-                    ? 'bg-drafted-green/10 border border-drafted-green/30' 
-                    : 'bg-white/5 hover:bg-white/10 border border-white/10'
-                }`}
-              >
+              <div key={video.id} className="relative">
+                <button
+                  onClick={() => setCurrentVideo(index)}
+                  className={`w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl transition-all ${
+                    isActive 
+                      ? 'bg-drafted-green/10 border border-drafted-green/30' 
+                      : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                  }`}
+                >
                 <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${
                   hasVideo ? 'bg-drafted-green/20' : 'bg-gray-700'
                 }`}>
@@ -220,27 +251,40 @@ export default function VideoHero({ major }) {
                   )}
                 </div>
                 
-                <div className="flex-1 text-left min-w-0">
-                  <p className={`font-medium text-sm sm:text-base truncate ${
-                    isActive ? 'text-white' : 'text-gray-300'
-                  }`}>
-                    {video.question}
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    {hasVideo ? `Recorded • ${video.duration}` : `Not recorded • ${video.duration}`}
-                  </p>
-                </div>
-
-                {hasVideo && isActive && (
-                  <div className="flex-shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-drafted-green"></div>
+                  <div className="flex-1 text-left min-w-0">
+                    <p className={`font-medium text-sm sm:text-base truncate ${
+                      isActive ? 'text-white' : 'text-gray-300'
+                    }`}>
+                      {video.question}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      {hasVideo ? `Recorded • ${video.duration}` : `Not recorded • ${video.duration}`}
+                    </p>
                   </div>
-                )}
-              </button>
+
+                  {hasVideo && isActive && (
+                    <div className="flex-shrink-0">
+                      <div className="w-2 h-2 rounded-full bg-drafted-green"></div>
+                    </div>
+                  )}
+                </button>
+                
+                {/* Record/Re-record button overlay */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRecordClick(index + 1);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-drafted-green/90 hover:bg-drafted-green text-white text-xs font-medium rounded-lg transition-all opacity-0 hover:opacity-100 group-hover:opacity-100"
+                >
+                  {hasVideo ? 'Re-record' : 'Record'}
+                </button>
+              </div>
             );
           })}
         </div>
       </div>
     </div>
+    </>
   );
 }

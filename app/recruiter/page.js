@@ -319,31 +319,12 @@ export default function RecruiterPage() {
   };
 
   const getSourceBadge = (source) => {
-    if (source === 'yc') {
-      return (
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-orange-500/10 border border-orange-500/20">
-          <img src={YC_LOGO_URL} alt="YC" className="w-4 h-4" />
-          <span className="text-xs text-orange-400 font-medium">YC</span>
-        </div>
-      );
-    }
+    // Don't show source badges - we'll show YC badge separately only for actual YC companies
     if (source === 'a16z') {
       return (
         <span className="px-2 py-0.5 text-xs rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20">
           a16z
         </span>
-      );
-    }
-    return null;
-  };
-
-  const getYCBadge = (company) => {
-    // Only show YC badge if explicitly marked as YC company
-    if (company['Y Combinator'] === 'Yes' || company.yc === 'Yes') {
-      return (
-        <div className="flex items-center justify-center w-6 h-6 rounded bg-orange-500/10 border border-orange-500/20" title="Y Combinator">
-          <img src={YC_LOGO_URL} alt="YC" className="w-4 h-4" />
-        </div>
       );
     }
     return null;
@@ -562,15 +543,26 @@ export default function RecruiterPage() {
                             onError={(e) => e.target.style.display = 'none'}
                           />
                         )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-white mb-1 line-clamp-1">
-                            {company.Company}
-                          </h3>
-                          {getSourceBadge(company.source)}
+                        <div className="flex-1 min-w-0 flex items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-lg font-semibold text-white line-clamp-1">
+                                {company.Company}
+                              </h3>
+                              {/* YC Badge - small, inline */}
+                              {company.source === 'yc' && (
+                                <img 
+                                  src={YC_LOGO_URL} 
+                                  alt="YC" 
+                                  className="w-4 h-4 flex-shrink-0" 
+                                  title="Y Combinator"
+                                />
+                              )}
+                            </div>
+                            {getSourceBadge(company.source)}
+                          </div>
                         </div>
                       </div>
-                      {/* YC Badge - only if actually YC */}
-                      {getYCBadge(company)}
                     </div>
 
                     {company.Description && (
