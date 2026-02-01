@@ -153,7 +153,7 @@ export default function StepUniversity({ data, onNext, onBack }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl md:text-6xl font-bold text-white mb-4"
       >
-        Where do you study? 🎓
+        Where do you study?
       </motion.h1>
 
       <motion.p

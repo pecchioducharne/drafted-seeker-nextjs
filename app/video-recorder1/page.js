@@ -8,6 +8,7 @@ import DraftedVideoRecorder from '../../components/video/DraftedVideoRecorder';
 import VideoGallery from '../../components/video/VideoGallery';
 import ScriptTipsPanel from '../../components/video/ScriptTipsPanel';
 import { ChevronRight, Sparkles, Play, ArrowLeft, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const QUESTION_NUMBER = 1;
 const TIME_LIMIT = 60000; // 60 seconds
@@ -16,7 +17,7 @@ const QUESTION_TIPS = "Focus on your unique strengths, achievements, and what se
 
 export default function VideoRecorder1() {
   const router = useRouter();
-  const { user, loading, profileData } = useAuth();
+  const { user, loading, profileData, updateProfileLocally } = useAuth();
   const [showScriptPanel, setShowScriptPanel] = useState(false);
   const [videoRecorded, setVideoRecorded] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
@@ -45,8 +46,47 @@ export default function VideoRecorder1() {
   };
 
   const handleVideoUploaded = (url) => {
-    console.log('Video uploaded:', url);
     setVideoUrl(url);
+    updateProfileLocally({ video1: url });
+
+    if (profileData?.sharedOnLinkedIn) return;
+
+    const email = user.email.toLowerCase();
+    const profileLink = `https://candidate.joindrafted.com/candidate/${email}`;
+    const message =
+      `Hi everyone! 👋\n\n` +
+      `I'm excited to share my Drafted profile, a platform where I created a video resume to showcase my skills, experiences, and personality in a whole new way.\n\n` +
+      `🎥 One engaging video highlighting my journey\n` +
+      `💼 Links to my LinkedIn, GitHub, and more\n\n` +
+      `Check it out here: ${profileLink}\n\n` +
+      `Drafted is changing how we connect with recruiters by making hiring more personal. Let's connect and redefine how we present ourselves professionally!\n\n` +
+      `#VideoResume #Drafted`;
+    const linkedinShareUrl =
+      `https://www.linkedin.com/shareArticle?mini=true` +
+      `&url=${encodeURIComponent(profileLink)}` +
+      `&title=${encodeURIComponent('My Drafted Video Profile')}` +
+      `&summary=${encodeURIComponent(message)}` +
+      `&source=Drafted`;
+
+    toast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-gray-900 border border-white/10 rounded-xl shadow-lg p-4 flex items-start gap-3`}>
+        <Sparkles className="w-6 h-6 text-white flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-white">Video saved!</p>
+          <p className="text-sm text-gray-400 mt-0.5">Share your profile on LinkedIn to unlock recruiter access.</p>
+          <button
+            onClick={() => {
+              window.open(linkedinShareUrl, '_blank');
+              toast.dismiss(t.id);
+            }}
+            className="mt-3 text-sm font-medium text-drafted-green hover:text-drafted-emerald transition-colors"
+          >
+            Share on LinkedIn →
+          </button>
+        </div>
+        <button onClick={() => toast.dismiss(t.id)} className="text-gray-500 hover:text-gray-300 flex-shrink-0">✕</button>
+      </div>
+    ), { duration: 8000 });
   };
 
   return (

@@ -87,7 +87,7 @@ export default function StepSuccess({ data, isCreatingAccount, setIsCreatingAcco
       setStatus('success');
       
       // Show success toast
-      toast.success('Account created successfully! 🎉', {
+      toast.success('Account created successfully!', {
         duration: 3000,
       });
 
@@ -206,7 +206,7 @@ export default function StepSuccess({ data, isCreatingAccount, setIsCreatingAcco
             transition={{ delay: 0.2 }}
             className="text-4xl md:text-6xl font-bold text-white"
           >
-            Welcome to Drafted! 🎉
+            Welcome to Drafted!
           </motion.h1>
 
           <motion.p

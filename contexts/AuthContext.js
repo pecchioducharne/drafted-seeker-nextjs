@@ -150,9 +150,9 @@ export function AuthProvider({ children }) {
           setProfileData(cached);
         }
 
-        // Then fetch fresh data in background
+        // Then fetch fresh data in background (force past the cache)
         try {
-          const profile = await fetchProfile(currentUser.email);
+          const profile = await fetchProfile(currentUser.email, true);
           console.log('[AuthContext] Profile fetched:', profile ? 'success' : 'not found');
         } catch (err) {
           console.error('[AuthContext] Background profile fetch failed:', err);

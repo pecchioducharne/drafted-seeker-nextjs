@@ -63,7 +63,7 @@ export default function StepPassword({ data, onNext, onBack }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl md:text-6xl font-bold text-white mb-4"
       >
-        Secure your account 🔒
+        Secure your account
       </motion.h1>
 
       <motion.p

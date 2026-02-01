@@ -26,13 +26,14 @@ function extractLinkedInActivityId(url) {
   return match ? match[1] : null;
 }
 
-const SideMenu = ({ 
-  isProfileLaunchable, 
-  onShowHowItWorks, 
-  onShareOnLinkedIn, 
-  hasFirstVideo, 
-  hasSharedOnLinkedIn, 
-  onDeleteAccount 
+const SideMenu = ({
+  isProfileLaunchable,
+  onShowHowItWorks,
+  onShareOnLinkedIn,
+  hasFirstVideo,
+  hasSharedOnLinkedIn,
+  onDeleteAccount,
+  onLinkedInVerified
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -48,6 +49,7 @@ const SideMenu = ({
   const [isValidatingUrl, setIsValidatingUrl] = useState(false);
   const [urlValidationError, setUrlValidationError] = useState('');
   const [urlValidationSuccess, setUrlValidationSuccess] = useState(false);
+  const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
   // Check if user is in the US
   useEffect(() => {
@@ -69,9 +71,9 @@ const SideMenu = ({
     if (!isProfileLaunchable) {
       e.preventDefault();
       if (!hasFirstVideo) {
-        setPopupMessage("Record your first 30-second video to start unlocking events! 🎬");
+        setPopupMessage("Record your first 30-second video to start unlocking events!");
       } else if (!hasSharedOnLinkedIn) {
-        setPopupMessage("Share your profile on LinkedIn to complete unlock and access events! 🚀");
+        setPopupMessage("Share your profile on LinkedIn to complete unlock and access events!");
       }
       setShowPopup(true);
     }
@@ -110,6 +112,27 @@ const SideMenu = ({
     setShowNudgeModal(true);
   };
 
+  const openLinkedInShare = () => {
+    const email = auth.currentUser?.email?.toLowerCase();
+    if (!email) return;
+    const profileLink = `https://candidate.joindrafted.com/candidate/${email}`;
+    const message =
+      `Hi everyone! 👋\n\n` +
+      `I'm excited to share my Drafted profile, a platform where I created a video resume to showcase my skills, experiences, and personality in a whole new way.\n\n` +
+      `🎥 One engaging video highlighting my journey\n` +
+      `💼 Links to my LinkedIn, GitHub, and more\n\n` +
+      `Check it out here: ${profileLink}\n\n` +
+      `Drafted is changing how we connect with recruiters by making hiring more personal. Let's connect and redefine how we present ourselves professionally!\n\n` +
+      `#VideoResume #Drafted`;
+    const linkedinShareUrl =
+      `https://www.linkedin.com/shareArticle?mini=true` +
+      `&url=${encodeURIComponent(profileLink)}` +
+      `&title=${encodeURIComponent('My Drafted Video Profile')}` +
+      `&summary=${encodeURIComponent(message)}` +
+      `&source=Drafted`;
+    window.open(linkedinShareUrl, '_blank');
+  };
+
   const handleLinkedInVerification = async () => {
     if (!linkedInPostUrl.trim()) {
       setUrlValidationError('Please enter a LinkedIn post URL');
@@ -143,12 +166,13 @@ const SideMenu = ({
       }, { merge: true });
 
       setUrlValidationSuccess(true);
-      toast.success('LinkedIn share verified! 🎉');
-      
+      toast.success('LinkedIn share verified!');
+      onLinkedInVerified?.();
+
       setTimeout(() => {
         setShowLinkedInVerificationModal(false);
+        setShowNudgeModal(false);
         setLinkedInPostUrl('');
-        window.location.reload();
       }, 1500);
     } catch (error) {
       console.error('Error verifying LinkedIn share:', error);
@@ -312,8 +336,37 @@ const SideMenu = ({
       >
         <h2 className="text-2xl font-bold text-white mb-4">Share on LinkedIn</h2>
         <p className="text-gray-300 mb-4">
-          Share your Drafted profile on LinkedIn, then paste the post URL here to verify.
+          Click below to share your profile, then paste the post URL here to verify.
         </p>
+        <button
+          onClick={openLinkedInShare}
+          className="w-full drafted-btn drafted-btn-primary text-sm py-2.5 flex items-center justify-center gap-2 mb-3"
+        >
+          <Image src={linkedinWhite} alt="LinkedIn" width={16} height={16} />
+          <span>Open LinkedIn Share</span>
+        </button>
+        <button
+          onClick={() => {
+            const email = auth.currentUser?.email?.toLowerCase();
+            const profileUrl = `https://candidate.joindrafted.com/candidate/${email}`;
+            navigator.clipboard.writeText(profileUrl);
+            setProfileUrlCopied(true);
+            setTimeout(() => setProfileUrlCopied(false), 2000);
+          }}
+          className="w-full text-sm py-2 flex items-center justify-center gap-2 text-gray-400 hover:text-white border border-white/10 hover:border-white/20 rounded-lg transition-all mb-4"
+        >
+          {profileUrlCopied ? (
+            <>
+              <FaCheck className="text-drafted-green" />
+              <span className="text-drafted-green">Copied!</span>
+            </>
+          ) : (
+            <>
+              <FaCopy />
+              <span>Copy Profile URL</span>
+            </>
+          )}
+        </button>
         <input
           type="text"
           value={linkedInPostUrl}
@@ -351,7 +404,7 @@ const SideMenu = ({
         className="max-w-md mx-auto mt-20 bg-gray-900/95 backdrop-blur-lg border border-white/10 rounded-2xl p-6 shadow-xl"
         overlayClassName="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-50 overflow-y-auto"
       >
-        <h2 className="text-2xl font-bold text-white mb-4">🔒 Unlock Job Search</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Unlock Job Search</h2>
         <p className="text-gray-300 mb-6">
           Complete these steps to unlock access to 3,000+ companies:
         </p>
@@ -373,12 +426,35 @@ const SideMenu = ({
             <span className="text-white">Share your profile on LinkedIn</span>
           </div>
         </div>
-        <button
-          onClick={() => setShowNudgeModal(false)}
-          className="w-full drafted-btn drafted-btn-primary"
-        >
-          Got it!
-        </button>
+        {!hasFirstVideo ? (
+          <button
+            onClick={() => {
+              setShowNudgeModal(false);
+              router.push('/video-recorder1');
+            }}
+            className="w-full drafted-btn drafted-btn-primary"
+          >
+            Record Video
+          </button>
+        ) : !hasSharedOnLinkedIn ? (
+          <button
+            onClick={() => {
+              setShowNudgeModal(false);
+              setShowLinkedInVerificationModal(true);
+            }}
+            className="w-full drafted-btn drafted-btn-primary flex items-center justify-center gap-2"
+          >
+            <Image src={linkedinWhite} alt="LinkedIn" width={16} height={16} />
+            Share on LinkedIn
+          </button>
+        ) : (
+          <button
+            onClick={() => setShowNudgeModal(false)}
+            className="w-full drafted-btn drafted-btn-primary"
+          >
+            Got it!
+          </button>
+        )}
       </ReactModal>
 
       {/* Generic Popup */}

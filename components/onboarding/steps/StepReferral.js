@@ -60,7 +60,7 @@ export default function StepReferral({ data, onNext, onBack, isCreatingAccount, 
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl md:text-6xl font-bold text-white mb-4"
       >
-        How did you hear about us? 🎯
+        How did you hear about us?
       </motion.h1>
 
       <motion.p

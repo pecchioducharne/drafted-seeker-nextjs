@@ -134,7 +134,7 @@ const Login = () => {
           {/* Form Card */}
           <form onSubmit={handleSubmit} className="drafted-card">
             {/* Animation */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6" style={{ filter: 'brightness(0) invert(1)' }}>
               <Lottie options={welcomeBack} height={140} width={140} />
             </div>
             

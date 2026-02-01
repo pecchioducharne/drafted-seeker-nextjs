@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkedIn, GitHub, Language, Email, Check } from '@mui/icons-material';
-import { Briefcase, GraduationCap, MapPin, Calendar, Edit2, X } from 'lucide-react';
+import { Briefcase, GraduationCap, MapPin, Calendar, Edit2, X, Copy, Check as LucideCheck } from 'lucide-react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../../lib/firebase';
 import toast from 'react-hot-toast';
@@ -58,6 +58,7 @@ export default function ProfileSnapshot() {
   const [isEditing, setIsEditing] = useState(false);
   const [showSkillSelector, setShowSkillSelector] = useState(false);
   const [editedData, setEditedData] = useState(profileData || {});
+  const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
   if (!profileData) return null;
 
@@ -117,9 +118,23 @@ export default function ProfileSnapshot() {
         {/* Header with Edit Button */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 truncate">
-              {profileData.firstName} {profileData.lastName}
-            </h1>
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white truncate">
+                {profileData.firstName} {profileData.lastName}
+              </h1>
+              <button
+                onClick={() => {
+                  const profileUrl = `https://candidate.joindrafted.com/candidate/${profileData.email}`;
+                  navigator.clipboard.writeText(profileUrl);
+                  setProfileUrlCopied(true);
+                  setTimeout(() => setProfileUrlCopied(false), 2000);
+                }}
+                className="flex-shrink-0 text-gray-400 hover:text-white transition-colors"
+                title="Copy profile URL"
+              >
+                {profileUrlCopied ? <LucideCheck className="w-4 h-4 text-drafted-green" /> : <Copy className="w-4 h-4" />}
+              </button>
+            </div>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-base sm:text-lg text-gray-300">
                 {profileData.major || 'Your Major'}

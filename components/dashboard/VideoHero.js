@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth, db } from '../../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 import { PlayCircle, Video, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import TypingGreeting from './TypingGreeting';
@@ -36,63 +34,34 @@ const videoData = [
 export default function VideoHero({ major }) {
   const router = useRouter();
   const { profileData } = useAuth();
-  const [currentVideo, setCurrentVideo] = useState(0);
-  const [videoUrls, setVideoUrls] = useState({
-    video1: '',
-    video2: '',
-    video3: ''
-  });
-  const [videoMetadata, setVideoMetadata] = useState({
-    video1: { isExternalLink: false },
-    video2: { isExternalLink: false },
-    video3: { isExternalLink: false }
-  });
+  const [currentVideo, setCurrentVideo] = React.useState(0);
+
+  const videoUrls = {
+    video1: profileData?.video1 || '',
+    video2: profileData?.video2 || '',
+    video3: profileData?.video3 || ''
+  };
+
+  const videoMetadata = {
+    video1: { isExternalLink: profileData?.video1IsExternalLink || false },
+    video2: { isExternalLink: profileData?.video2IsExternalLink || false },
+    video3: { isExternalLink: profileData?.video3IsExternalLink || profileData?.isScreenRecordingLink || false }
+  };
 
   useEffect(() => {
-    const fetchVideoData = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userDocRef = doc(db, 'drafted-accounts', user.email.toLowerCase());
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
-          const userData = docSnap.data();
-          const videos = {
-            video1: userData.video1 || '',
-            video2: userData.video2 || '',
-            video3: userData.video3 || ''
-          };
-          
-          setVideoUrls(videos);
-          
-          setVideoMetadata({
-            video1: { isExternalLink: userData.video1IsExternalLink || false },
-            video2: { isExternalLink: userData.video2IsExternalLink || false },
-            video3: { isExternalLink: userData.video3IsExternalLink || userData.isScreenRecordingLink || false }
-          });
-
-          // Show encouraging messages based on progress
-          const videoCount = Object.values(videos).filter(v => v).length;
-          if (videoCount === 1 && !sessionStorage.getItem('video1_toast_shown')) {
-            setTimeout(() => {
-              toast.success("Hell yeah! First video down. Two more and you're unstoppable.", { duration: 5000 });
-              sessionStorage.setItem('video1_toast_shown', 'true');
-            }, 1000);
-          } else if (videoCount === 2 && !sessionStorage.getItem('video2_toast_shown')) {
-            setTimeout(() => {
-              toast.success("You're on fire! One more video and recruiters won't know what hit them.", { duration: 5000 });
-              sessionStorage.setItem('video2_toast_shown', 'true');
-            }, 1000);
-          } else if (videoCount === 3 && !sessionStorage.getItem('video3_toast_shown')) {
-            setTimeout(() => {
-              toast.success("🔥 All three videos done! Now go find some companies and start nudging.", { duration: 6000 });
-              sessionStorage.setItem('video3_toast_shown', 'true');
-            }, 1000);
-          }
-        }
-      }
-    };
-    fetchVideoData();
-  }, []);
+    if (!profileData) return;
+    const videoCount = [profileData.video1, profileData.video2, profileData.video3].filter(Boolean).length;
+    if (videoCount === 1 && !sessionStorage.getItem('video1_toast_shown')) {
+      toast.success("Hell yeah! First video down. Two more and you're unstoppable.", { duration: 5000 });
+      sessionStorage.setItem('video1_toast_shown', 'true');
+    } else if (videoCount === 2 && !sessionStorage.getItem('video2_toast_shown')) {
+      toast.success("You're on fire! One more video and recruiters won't know what hit them.", { duration: 5000 });
+      sessionStorage.setItem('video2_toast_shown', 'true');
+    } else if (videoCount === 3 && !sessionStorage.getItem('video3_toast_shown')) {
+      toast.success("All three videos done! Now go find some companies and start nudging.", { duration: 6000 });
+      sessionStorage.setItem('video3_toast_shown', 'true');
+    }
+  }, [profileData]);
 
   const handleRecordClick = (videoNumber) => {
     router.push(`/video-recorder${videoNumber}`);
