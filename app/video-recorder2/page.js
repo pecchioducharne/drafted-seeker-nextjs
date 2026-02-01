@@ -119,6 +119,7 @@ export default function VideoRecorder2() {
                 <DraftedVideoRecorder
                   timeLimit={TIME_LIMIT}
                   videoNumber={QUESTION_NUMBER}
+                  userEmail={user.email.toLowerCase()}
                   onVideoRecorded={handleVideoRecorded}
                   onVideoUploaded={handleVideoUploaded}
                   existingVideoUrl={videoUrl}

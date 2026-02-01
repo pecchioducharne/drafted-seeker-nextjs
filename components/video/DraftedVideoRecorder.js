@@ -14,6 +14,7 @@ import useVideoRecorder from '../../hooks/useVideoRecorder';
 export default function DraftedVideoRecorder({
   timeLimit = 60000, // in milliseconds
   videoNumber = 1,
+  userEmail,
   onVideoRecorded,
   onVideoUploaded,
   existingVideoUrl = null
@@ -68,8 +69,7 @@ export default function DraftedVideoRecorder({
       const { uploadVideoAndSave } = await import('../../lib/video/uploadService');
       const result = await uploadVideoAndSave(
         recordedBlob,
-        // User email will be passed from parent
-        'user@example.com', // This should come from auth context
+        userEmail,
         videoNumber,
         (progress) => setUploadProgress(progress)
       );

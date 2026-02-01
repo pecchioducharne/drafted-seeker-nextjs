@@ -176,6 +176,7 @@ export default function VideoRecorder3() {
                   <DraftedVideoRecorder
                     timeLimit={TIME_LIMIT}
                     videoNumber={QUESTION_NUMBER}
+                    userEmail={user.email.toLowerCase()}
                     onVideoRecorded={handleVideoRecorded}
                     onVideoUploaded={handleVideoUploaded}
                     existingVideoUrl={videoUrl}
@@ -256,8 +257,15 @@ export default function VideoRecorder3() {
                           </button>
                           <button
                             onClick={async () => {
-                              const { uploadScreenRecording } = await import('../../lib/video/uploadService');
-                              // Upload logic here
+                              try {
+                                const { uploadScreenRecording } = await import('../../lib/video/uploadService');
+                                const result = await uploadScreenRecording(screenRecorder.recordedBlob, user.email.toLowerCase());
+                                if (result?.url) {
+                                  handleVideoUploaded(result.url);
+                                }
+                              } catch (err) {
+                                console.error('Screen recording upload failed:', err);
+                              }
                             }}
                             className="flex-1 drafted-btn drafted-btn-primary py-3 flex items-center justify-center gap-2"
                           >
@@ -287,9 +295,19 @@ export default function VideoRecorder3() {
                     </div>
                     {externalLink && (
                       <button
-                        onClick={() => {
-                          // Save external link to Firestore
-                          handleVideoUploaded(externalLink);
+                        onClick={async () => {
+                          try {
+                            const { doc, updateDoc } = await import('firebase/firestore');
+                            const { db } = await import('../../lib/firebase');
+                            const userDocRef = doc(db, 'drafted-accounts', user.email.toLowerCase());
+                            await updateDoc(userDocRef, {
+                              video3: externalLink,
+                              video3IsExternalLink: true
+                            });
+                            handleVideoUploaded(externalLink);
+                          } catch (err) {
+                            console.error('Failed to save external link:', err);
+                          }
                         }}
                         className="w-full drafted-btn drafted-btn-primary py-3"
                       >
