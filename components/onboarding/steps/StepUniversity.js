@@ -95,7 +95,7 @@ export default function StepUniversity({ data, onNext, onBack }) {
     }
 
     try {
-      const response = await axios.post('/.netlify/functions/searchUniversities', {
+      const response = await axios.post('/api/searchUniversities', {
         query: inputValue
       });
 
