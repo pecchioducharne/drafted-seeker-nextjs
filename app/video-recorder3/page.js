@@ -122,7 +122,7 @@ export default function VideoRecorder3() {
                 <span className="inline-block px-3 py-1 rounded-full bg-drafted-green/10 text-drafted-green text-sm font-medium mb-4">
                   Question 3 of 3 - Final Question
                 </span>
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-emerald-400 to-green-500 bg-clip-text text-transparent">
                   {QUESTION_TEXT}
                 </h1>
                 <p className="text-lg text-gray-400 max-w-2xl">
