@@ -7,25 +7,34 @@ import LoadingScreen from '../../components/shared/LoadingScreen';
 import DraftedVideoRecorder from '../../components/video/DraftedVideoRecorder';
 import VideoGallery from '../../components/video/VideoGallery';
 import ScriptTipsPanel from '../../components/video/ScriptTipsPanel';
+import QuestionExplainedModal from '../../components/video/QuestionExplainedModal';
 import useScreenRecorder from '../../hooks/useScreenRecorder';
 import { 
   ChevronRight, ChevronLeft, Sparkles, ArrowLeft, Check, 
-  Video, Monitor, Link2, Upload 
+  Video, Monitor, Link2, Upload, HelpCircle 
 } from 'lucide-react';
 
 const QUESTION_NUMBER = 3;
 const TIME_LIMIT = 90000; // 90 seconds
-const QUESTION_TEXT = "Talk about a challenge you've overcome";
-const QUESTION_TIPS = "Share a specific challenge - technical, personal, or academic. Explain the situation, what you did, and what you learned.";
+const QUESTION_OPTIONS = [
+  "Talk about a challenge you've overcome",
+  "Walk us through something you've built"
+];
+const QUESTION_TIPS = [
+  "Share a specific challenge - technical, personal, or academic. Explain the situation, what you did, and what you learned.",
+  "Describe a project you've created. Explain your process, the technologies used, and the impact it had."
+];
 
 export default function VideoRecorder3() {
   const router = useRouter();
   const { user, loading, profileData } = useAuth();
   const [showScriptPanel, setShowScriptPanel] = useState(false);
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [videoRecorded, setVideoRecorded] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
   const [recordingMode, setRecordingMode] = useState('camera'); // 'camera', 'screen', 'link'
   const [externalLink, setExternalLink] = useState('');
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0); // Toggle between two questions
 
   // Screen recording hook
   const screenRecorder = useScreenRecorder({
@@ -84,28 +93,37 @@ export default function VideoRecorder3() {
               Back to Dashboard
             </button>
             
-            {/* Progress Steps */}
+            {/* Progress Steps - Clickable Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder1')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${video1Complete ? 'bg-drafted-green' : 'bg-white/10'}`}>
                   {video1Complete ? <Check className="w-4 h-4 text-white" /> : <span className="text-gray-400 text-sm font-bold">1</span>}
                 </div>
                 <span className={video1Complete ? 'text-white' : 'text-gray-400'}>Stand Out</span>
-              </div>
+              </button>
               <ChevronRight className="w-5 h-5 text-gray-600" />
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder2')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${video2Complete ? 'bg-drafted-green' : 'bg-white/10'}`}>
                   {video2Complete ? <Check className="w-4 h-4 text-white" /> : <span className="text-gray-400 text-sm font-bold">2</span>}
                 </div>
                 <span className={video2Complete ? 'text-white' : 'text-gray-400'}>Your Story</span>
-              </div>
+              </button>
               <ChevronRight className="w-5 h-5 text-gray-600" />
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder3')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className="w-8 h-8 rounded-full bg-drafted-green flex items-center justify-center">
                   {videoRecorded ? <Check className="w-4 h-4 text-white" /> : <span className="text-white text-sm font-bold">3</span>}
                 </div>
                 <span className="text-white font-medium">Challenges</span>
-              </div>
+              </button>
             </div>
             
             <div className="w-32" />
@@ -122,11 +140,29 @@ export default function VideoRecorder3() {
                 <span className="inline-block px-3 py-1 rounded-full bg-drafted-green/10 text-drafted-green text-sm font-medium mb-4">
                   Question 3 of 3 - Final Question
                 </span>
+                
+                {/* Question Toggle */}
+                <div className="flex gap-2 mb-4 justify-center lg:justify-start">
+                  {QUESTION_OPTIONS.map((option, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedQuestionIndex(index)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        selectedQuestionIndex === index
+                          ? 'bg-drafted-green text-white'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {index === 0 ? 'Challenge' : 'Project'}
+                    </button>
+                  ))}
+                </div>
+
                 <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-emerald-400 to-green-500 bg-clip-text text-transparent">
-                  {QUESTION_TEXT}
+                  {QUESTION_OPTIONS[selectedQuestionIndex]}
                 </h1>
                 <p className="text-lg text-gray-400 max-w-2xl">
-                  {QUESTION_TIPS}
+                  {QUESTION_TIPS[selectedQuestionIndex]}
                 </p>
               </div>
               
@@ -322,6 +358,23 @@ export default function VideoRecorder3() {
             
             {/* Right Column - Script Tips & Actions */}
             <div className="space-y-6">
+              {/* Question Explained Button */}
+              <button
+                onClick={() => setShowQuestionModal(true)}
+                className="w-full drafted-card hover:bg-white/10 transition-all group cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <HelpCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-white">Question Explained</h3>
+                    <p className="text-sm text-gray-400">Pro tips for answering</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+
               {/* Generate Script Tips Button */}
               <button
                 onClick={() => setShowScriptPanel(true)}
@@ -338,29 +391,6 @@ export default function VideoRecorder3() {
                   <ChevronRight className="w-5 h-5 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
-              
-              {/* STAR Method Card */}
-              <div className="drafted-card">
-                <h3 className="text-lg font-semibold text-white mb-4">STAR Method</h3>
-                <ul className="space-y-3 text-sm text-gray-400">
-                  <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded bg-drafted-green/20 flex items-center justify-center text-drafted-green text-xs font-bold">S</div>
-                    <span><strong className="text-white">Situation:</strong> Set the scene</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded bg-drafted-green/20 flex items-center justify-center text-drafted-green text-xs font-bold">T</div>
-                    <span><strong className="text-white">Task:</strong> Your responsibility</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded bg-drafted-green/20 flex items-center justify-center text-drafted-green text-xs font-bold">A</div>
-                    <span><strong className="text-white">Action:</strong> What you did</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded bg-drafted-green/20 flex items-center justify-center text-drafted-green text-xs font-bold">R</div>
-                    <span><strong className="text-white">Result:</strong> The outcome</span>
-                  </li>
-                </ul>
-              </div>
               
               {/* Navigation */}
               <div className="space-y-3">
@@ -384,14 +414,22 @@ export default function VideoRecorder3() {
         </div>
       </div>
       
+      {/* Question Explained Modal */}
+      <QuestionExplainedModal
+        isOpen={showQuestionModal}
+        onClose={() => setShowQuestionModal(false)}
+        questionNumber={QUESTION_NUMBER}
+        selectedOption={selectedQuestionIndex}
+      />
+
       {/* Script Tips Panel */}
       <ScriptTipsPanel
         isOpen={showScriptPanel}
         onClose={() => setShowScriptPanel(false)}
         userData={profileData}
         questionNumber={QUESTION_NUMBER}
-        questionText={QUESTION_TEXT}
-        questionTips={QUESTION_TIPS}
+        questionText={QUESTION_OPTIONS[selectedQuestionIndex]}
+        questionTips={QUESTION_TIPS[selectedQuestionIndex]}
       />
     </div>
   );

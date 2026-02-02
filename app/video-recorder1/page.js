@@ -7,7 +7,8 @@ import LoadingScreen from '../../components/shared/LoadingScreen';
 import DraftedVideoRecorder from '../../components/video/DraftedVideoRecorder';
 import VideoGallery from '../../components/video/VideoGallery';
 import ScriptTipsPanel from '../../components/video/ScriptTipsPanel';
-import { ChevronRight, Sparkles, Play, ArrowLeft, Check } from 'lucide-react';
+import QuestionExplainedModal from '../../components/video/QuestionExplainedModal';
+import { ChevronRight, Sparkles, Play, ArrowLeft, Check, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const QUESTION_NUMBER = 1;
@@ -19,6 +20,7 @@ export default function VideoRecorder1() {
   const router = useRouter();
   const { user, loading, profileData, updateProfileLocally } = useAuth();
   const [showScriptPanel, setShowScriptPanel] = useState(false);
+  const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [videoRecorded, setVideoRecorded] = useState(false);
   const [videoUrl, setVideoUrl] = useState(null);
 
@@ -105,28 +107,37 @@ export default function VideoRecorder1() {
               Back to Dashboard
             </button>
             
-            {/* Progress Steps */}
+            {/* Progress Steps - Clickable Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder1')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className="w-8 h-8 rounded-full bg-drafted-green flex items-center justify-center">
                   {videoRecorded ? <Check className="w-4 h-4 text-white" /> : <span className="text-white text-sm font-bold">1</span>}
                 </div>
                 <span className="text-white font-medium">Stand Out</span>
-              </div>
+              </button>
               <ChevronRight className="w-5 h-5 text-gray-600" />
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder2')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                   <span className="text-gray-400 text-sm font-bold">2</span>
                 </div>
                 <span className="text-gray-400">Your Story</span>
-              </div>
+              </button>
               <ChevronRight className="w-5 h-5 text-gray-600" />
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/video-recorder3')}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                   <span className="text-gray-400 text-sm font-bold">3</span>
                 </div>
                 <span className="text-gray-400">Challenges</span>
-              </div>
+              </button>
             </div>
             
             <div className="w-32" /> {/* Spacer for alignment */}
@@ -174,6 +185,23 @@ export default function VideoRecorder1() {
             
             {/* Right Column - Script Tips & Actions */}
             <div className="space-y-6">
+              {/* Question Explained Button */}
+              <button
+                onClick={() => setShowQuestionModal(true)}
+                className="w-full drafted-card hover:bg-white/10 transition-all group cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <HelpCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-white">Question Explained</h3>
+                    <p className="text-sm text-gray-400">Pro tips for answering</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
+                </div>
+              </button>
+
               {/* Generate Script Tips Button */}
               <button
                 onClick={() => setShowScriptPanel(true)}
@@ -190,29 +218,6 @@ export default function VideoRecorder1() {
                   <ChevronRight className="w-5 h-5 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
-              
-              {/* Tips Card */}
-              <div className="drafted-card">
-                <h3 className="text-lg font-semibold text-white mb-4">Recording Tips</h3>
-                <ul className="space-y-3 text-sm text-gray-400">
-                  <li className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-drafted-green mt-2" />
-                    <span>Look directly at the camera, not at yourself</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-drafted-green mt-2" />
-                    <span>Find a quiet space with good lighting</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-drafted-green mt-2" />
-                    <span>Speak clearly and at a natural pace</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-drafted-green mt-2" />
-                    <span>Be specific with examples from your experience</span>
-                  </li>
-                </ul>
-              </div>
               
               {/* Navigation */}
               <div className="space-y-3">
@@ -235,6 +240,13 @@ export default function VideoRecorder1() {
         </div>
       </div>
       
+      {/* Question Explained Modal */}
+      <QuestionExplainedModal
+        isOpen={showQuestionModal}
+        onClose={() => setShowQuestionModal(false)}
+        questionNumber={QUESTION_NUMBER}
+      />
+
       {/* Script Tips Panel */}
       <ScriptTipsPanel
         isOpen={showScriptPanel}
