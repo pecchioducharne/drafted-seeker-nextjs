@@ -11,7 +11,8 @@ const useScreenRecorder = ({
   onRecordingComplete,
   onStartRecording,
   onStopRecording,
-  onError
+  onError,
+  autoStartRecording = true // Automatically start recording when screen share begins
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState(null);
@@ -237,6 +238,17 @@ const useScreenRecorder = ({
     setTimeRemaining(timeLimit);
     cleanup();
   }, [timeLimit, cleanup]);
+
+  // Auto-start recording when preview becomes active
+  useEffect(() => {
+    if (autoStartRecording && isPreviewActive && !isRecording && !recordedBlob) {
+      // Small delay to ensure stream is fully ready
+      const timer = setTimeout(() => {
+        startRecording();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoStartRecording, isPreviewActive, isRecording, recordedBlob, startRecording]);
 
   // Cleanup on unmount
   useEffect(() => {

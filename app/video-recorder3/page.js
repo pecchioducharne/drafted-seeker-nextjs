@@ -198,12 +198,13 @@ export default function VideoRecorder3() {
                       ) : (
                         <div className="text-center p-8">
                           <Monitor className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                          <p className="text-gray-400 mb-4">Share your screen to demo a project or walk through a challenge</p>
+                          <p className="text-gray-400 mb-2">Share your screen to demo a project or walk through a challenge</p>
+                          <p className="text-sm text-gray-500 mb-4">Recording will start automatically once you share</p>
                           <button
                             onClick={screenRecorder.startPreview}
                             className="drafted-btn drafted-btn-primary px-6 py-2"
                           >
-                            Share Screen
+                            Share Screen & Start Recording
                           </button>
                         </div>
                       )}
@@ -219,24 +220,16 @@ export default function VideoRecorder3() {
                       )}
                     </div>
                     
-                    {/* Screen recording controls */}
-                    {screenRecorder.isPreviewActive && !screenRecorder.recordedBlob && (
-                      <div className="flex justify-center">
-                        {!screenRecorder.isRecording ? (
-                          <button
-                            onClick={screenRecorder.startRecording}
-                            className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30"
-                          >
-                            <div className="w-6 h-6 rounded-full bg-white" />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={screenRecorder.stopRecording}
-                            className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30 animate-pulse"
-                          >
-                            <div className="w-6 h-6 rounded bg-white" />
-                          </button>
-                        )}
+                    {/* Screen recording controls - only show stop button while recording */}
+                    {screenRecorder.isRecording && !screenRecorder.recordedBlob && (
+                      <div className="flex flex-col items-center gap-3">
+                        <button
+                          onClick={screenRecorder.stopRecording}
+                          className="w-16 h-16 rounded-full bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30 animate-pulse"
+                        >
+                          <div className="w-6 h-6 rounded bg-white" />
+                        </button>
+                        <p className="text-sm text-gray-400">Click to stop recording</p>
                       </div>
                     )}
                     

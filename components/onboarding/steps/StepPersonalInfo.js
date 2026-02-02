@@ -3,27 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
-
-const MAJORS = [
-  'Computer Science',
-  'Business Administration',
-  'Engineering',
-  'Psychology',
-  'Biology',
-  'Economics',
-  'Mathematics',
-  'Political Science',
-  'Communications',
-  'English',
-  'Nursing',
-  'Marketing',
-  'Finance',
-  'Accounting',
-  'Data Science',
-  'Mechanical Engineering',
-  'Electrical Engineering',
-  'Other'
-];
+import MajorAutocomplete from '../MajorAutocomplete';
+import YearAutocomplete from '../YearAutocomplete';
 
 const COMPANY_PREFERENCES = [
   'Fortune 500',
@@ -47,7 +28,6 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
     firstName: data.firstName || '',
     lastName: data.lastName || '',
     major: data.major || '',
-    customMajor: data.customMajor || '',
     graduationMonth: data.graduationMonth || 'May',
     graduationYear: data.graduationYear || currentYear + 1,
     linkedInURL: data.linkedInURL || '',
@@ -57,7 +37,6 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
   });
   
   const [errors, setErrors] = useState({});
-  const [showCustomMajor, setShowCustomMajor] = useState(false);
   const firstNameRef = useRef(null);
 
   useEffect(() => {
@@ -79,13 +58,12 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
       newErrors.lastName = 'Last name is required';
     }
     
-    if (!formData.major && !formData.customMajor.trim()) {
+    if (!formData.major || !formData.major.trim()) {
       newErrors.major = 'Please select or enter your major';
     }
     
     // GitHub required for CS majors
-    if ((formData.major === 'Computer Science' || formData.customMajor.toLowerCase().includes('computer')) 
-        && !formData.gitHubURL.trim()) {
+    if (formData.major && formData.major.toLowerCase().includes('computer') && !formData.gitHubURL.trim()) {
       newErrors.gitHubURL = 'GitHub URL is required for Computer Science majors';
     }
 
@@ -101,15 +79,12 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
     }
   };
 
-  const handleMajorSelect = (major) => {
-    if (major === 'Other') {
-      setShowCustomMajor(true);
-      handleChange('major', '');
-    } else {
-      setShowCustomMajor(false);
-      handleChange('major', major);
-      handleChange('customMajor', '');
-    }
+  const handleMajorChange = (major) => {
+    handleChange('major', major);
+  };
+
+  const handleCustomMajor = (customMajor) => {
+    handleChange('major', customMajor);
   };
 
   const toggleCompanyPreference = (company) => {
@@ -127,7 +102,7 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
         ...formData,
         firstName: capitalizeFirstLetter(formData.firstName.trim()),
         lastName: capitalizeFirstLetter(formData.lastName.trim()),
-        major: showCustomMajor ? formData.customMajor.trim() : formData.major
+        major: formData.major.trim()
       });
     }
   };
@@ -200,45 +175,19 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
           </motion.div>
         </div>
 
-        {/* Major Selection */}
+        {/* Major Selection with Autocomplete */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           <label className="block text-gray-400 text-sm mb-3">Major</label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {MAJORS.map((major) => (
-              <button
-                key={major}
-                onClick={() => handleMajorSelect(major)}
-                className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  formData.major === major
-                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(74,222,128,0.4)]'
-                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
-                }`}
-              >
-                {major}
-              </button>
-            ))}
-          </div>
-          {showCustomMajor && (
-            <div className="flex items-center text-xl text-white mt-3">
-              <span className="text-green-400 mr-4 font-mono flex-shrink-0">{'>'}</span>
-              <input
-                type="text"
-                value={formData.customMajor}
-                onChange={(e) => handleChange('customMajor', e.target.value)}
-                placeholder="Enter your major"
-                className="bg-transparent border-none outline-none flex-1 placeholder-gray-500 font-light"
-                style={{ caretColor: '#4ade80' }}
-                autoFocus
-              />
-            </div>
-          )}
-          {errors.major && (
-            <p className="text-red-400 text-sm mt-1">{errors.major}</p>
-          )}
+          <MajorAutocomplete
+            value={formData.major}
+            onChange={handleMajorChange}
+            onCustomMajor={handleCustomMajor}
+            error={errors.major}
+          />
         </motion.div>
 
         {/* Graduation */}
@@ -265,16 +214,12 @@ export default function StepPersonalInfo({ data, onNext, onBack }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <label className="block text-gray-400 text-sm mb-2">Graduation Year</label>
-            <select
+            <YearAutocomplete
               value={formData.graduationYear}
-              onChange={(e) => handleChange('graduationYear', parseInt(e.target.value))}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-green-400 focus:ring-1 focus:ring-green-400 outline-none"
-            >
-              {GRADUATION_YEARS.map((year) => (
-                <option key={year} value={year} className="bg-slate-800">{year}</option>
-              ))}
-            </select>
+              onChange={(year) => handleChange('graduationYear', year)}
+              error={errors.graduationYear}
+              label="Graduation Year"
+            />
           </motion.div>
         </div>
 

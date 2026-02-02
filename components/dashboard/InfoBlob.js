@@ -11,6 +11,8 @@ import ReactModal from 'react-modal';
 import toast from 'react-hot-toast';
 import { useAuth } from "../../contexts/AuthContext";
 import SkillSelector from "./SkillSelector";
+import MajorAutocomplete from "../onboarding/MajorAutocomplete";
+import YearAutocomplete from "../onboarding/YearAutocomplete";
 
 // Set app element for react-modal
 if (typeof window !== 'undefined') {
@@ -177,12 +179,11 @@ const InfoBlob = ({ onProfileUpdate }) => {
               <div className="text-white font-semibold">{profileData.university}</div>
               {isEditing ? (
                 <div className="space-y-2 mt-2">
-                  <input
-                    type="text"
+                  <MajorAutocomplete
                     value={editedData.major || ''}
-                    onChange={(e) => setEditedData({...editedData, major: e.target.value})}
-                    placeholder="Major"
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-drafted-green/50"
+                    onChange={(major) => setEditedData({...editedData, major})}
+                    onCustomMajor={(major) => setEditedData({...editedData, major})}
+                    error=""
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <select
@@ -195,16 +196,12 @@ const InfoBlob = ({ onProfileUpdate }) => {
                         <option key={month} value={month} className="bg-slate-800">{month}</option>
                       ))}
                     </select>
-                    <select
+                    <YearAutocomplete
                       value={editedData.graduationYear || ''}
-                      onChange={(e) => setEditedData({...editedData, graduationYear: parseInt(e.target.value)})}
-                      className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-drafted-green/50"
-                    >
-                      <option value="" className="bg-slate-800">Year</option>
-                      {Array.from({ length: 8 }, (_, i) => new Date().getFullYear() + i - 2).map(year => (
-                        <option key={year} value={year} className="bg-slate-800">{year}</option>
-                      ))}
-                    </select>
+                      onChange={(year) => setEditedData({...editedData, graduationYear: year})}
+                      error=""
+                      label=""
+                    />
                   </div>
                 </div>
               ) : (
