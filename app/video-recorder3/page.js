@@ -13,6 +13,7 @@ import {
   ChevronRight, ChevronLeft, Sparkles, ArrowLeft, Check, 
   Video, Monitor, Link2, Upload, HelpCircle 
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const QUESTION_NUMBER = 3;
 const TIME_LIMIT = 90000; // 90 seconds
@@ -68,9 +69,17 @@ export default function VideoRecorder3() {
     setVideoRecorded(true);
   };
 
-  const handleVideoUploaded = (url) => {
+  const handleVideoUploaded = (url, transcriptionStarted = false) => {
     console.log('Video uploaded:', url);
     setVideoUrl(url);
+    
+    // Show transcription status if started
+    if (transcriptionStarted) {
+      toast.success('Video uploaded! Transcription started in background...', {
+        duration: 4000,
+        icon: '🎤'
+      });
+    }
   };
 
   // Check completion status

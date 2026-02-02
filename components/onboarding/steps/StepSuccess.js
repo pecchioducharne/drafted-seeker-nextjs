@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth, db, storage } from '@/lib/firebase';
 import { usePostHog } from '@/contexts/PostHogContext';
 import toast from 'react-hot-toast';
 import { Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
@@ -36,6 +37,24 @@ export default function StepSuccess({ data, isCreatingAccount, setIsCreatingAcco
       const user = userCredential.user;
       const lowercaseEmail = data.email.toLowerCase();
 
+      // Upload resume to Firebase Storage if provided
+      let resumeURL = '';
+      if (data.resumeFile) {
+        try {
+          console.log('📄 Uploading resume to Firebase Storage...');
+          const timestamp = Date.now();
+          const fileName = `${timestamp}_${data.resumeFile.name}`;
+          const storageRef = ref(storage, `resumes/${user.uid}/${fileName}`);
+          await uploadBytes(storageRef, data.resumeFile);
+          resumeURL = await getDownloadURL(storageRef);
+          console.log('✅ Resume uploaded successfully:', resumeURL);
+        } catch (resumeError) {
+          console.error('❌ Resume upload failed:', resumeError);
+          // Don't fail account creation if resume upload fails
+          toast.error('Resume upload failed, but account was created successfully.');
+        }
+      }
+
       // Prepare user data for Firestore
       const userData = {
         firstName: data.firstName,
@@ -52,7 +71,7 @@ export default function StepSuccess({ data, isCreatingAccount, setIsCreatingAcco
         video1: '',
         video2: '',
         video3: '',
-        resume: '',
+        resume: resumeURL,
         experience: data.experience || [],
         referralInfo: data.referralSource === 'other' 
           ? `${data.referralSource}: ${data.referralDetail}` 

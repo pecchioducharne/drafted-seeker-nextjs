@@ -47,9 +47,17 @@ export default function VideoRecorder1() {
     setVideoRecorded(true);
   };
 
-  const handleVideoUploaded = (url) => {
+  const handleVideoUploaded = (url, transcriptionStarted = false) => {
     setVideoUrl(url);
     updateProfileLocally({ video1: url });
+
+    // Show transcription status if started
+    if (transcriptionStarted) {
+      toast.success('Video uploaded! Transcription started in background...', {
+        duration: 4000,
+        icon: '🎤'
+      });
+    }
 
     if (profileData?.sharedOnLinkedIn) return;
 
@@ -76,6 +84,9 @@ export default function VideoRecorder1() {
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-white">Video saved!</p>
           <p className="text-sm text-gray-400 mt-0.5">Share your profile on LinkedIn to unlock recruiter access.</p>
+          {transcriptionStarted && (
+            <p className="text-xs text-gray-500 mt-1">🎤 Transcription in progress...</p>
+          )}
           <button
             onClick={() => {
               window.open(linkedinShareUrl, '_blank');

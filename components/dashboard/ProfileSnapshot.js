@@ -11,6 +11,9 @@ import SkillSelector from './SkillSelector';
 import RoleSelector from './RoleSelector';
 import MajorAutocomplete from '../onboarding/MajorAutocomplete';
 import YearAutocomplete from '../onboarding/YearAutocomplete';
+import ResumeUploadModal from './ResumeUploadModal';
+import CultureTags from './CultureTags';
+import { FileText } from 'lucide-react';
 
 // Get university favicon
 const getUniversityFavicon = (universityName) => {
@@ -59,6 +62,7 @@ export default function ProfileSnapshot() {
   const { profileData, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showSkillSelector, setShowSkillSelector] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
   const [editedData, setEditedData] = useState(profileData || {});
   const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
@@ -305,6 +309,40 @@ export default function ProfileSnapshot() {
                 )}
               </div>
             )}
+
+            {/* Resume Section */}
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                Resume
+              </h3>
+              {profileData.resume ? (
+                <div className="flex items-center gap-2">
+                  <a 
+                    href={profileData.resume} 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="drafted-btn drafted-btn-glass flex items-center gap-2 flex-1 justify-center"
+                  >
+                    <FileText className="w-4 h-4" />
+                    View Resume
+                  </a>
+                  <button 
+                    onClick={() => setShowResumeModal(true)}
+                    className="drafted-btn drafted-btn-ghost text-sm px-4"
+                  >
+                    Replace
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setShowResumeModal(true)}
+                  className="drafted-btn drafted-btn-primary w-full flex items-center gap-2 justify-center"
+                >
+                  <FileText className="w-4 h-4" />
+                  Upload Resume
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Right: Job Preferences & Role */}
@@ -415,6 +453,44 @@ export default function ProfileSnapshot() {
                 )}
               </div>
             </div>
+
+            {/* Culture Tags */}
+            {profileData?.culture?.cultureTags && profileData.culture.cultureTags.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                    Culture Tags
+                  </h3>
+                  <button
+                    onClick={async () => {
+                      const hasAllVideos = profileData.video1 && profileData.video2 && profileData.video3;
+                      if (!hasAllVideos) {
+                        toast.error('Complete all 3 videos to generate culture tags');
+                        return;
+                      }
+                      
+                      const loadingToast = toast.loading('Regenerating culture tags...');
+                      try {
+                        const { default: generateCultureTags } = await import('../../lib/services/CultureTagService');
+                        await generateCultureTags(auth.currentUser.email.toLowerCase());
+                        await refreshProfile();
+                        toast.success('Culture tags regenerated!', { id: loadingToast });
+                      } catch (error) {
+                        console.error('Failed to regenerate culture tags:', error);
+                        toast.error('Failed to regenerate culture tags', { id: loadingToast });
+                      }
+                    }}
+                    className="text-xs text-drafted-green hover:text-drafted-emerald transition-colors font-medium"
+                  >
+                    Regenerate
+                  </button>
+                </div>
+                <CultureTags
+                  tags={profileData.culture.cultureTags}
+                  descriptions={profileData.culture.cultureDescriptions}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -425,6 +501,13 @@ export default function ProfileSnapshot() {
         onClose={() => setShowSkillSelector(false)}
         initialSkills={profileData.skills || []}
         onSave={handleSaveSkills}
+      />
+
+      {/* Resume Upload Modal */}
+      <ResumeUploadModal
+        isOpen={showResumeModal}
+        onClose={() => setShowResumeModal(false)}
+        onUploadComplete={refreshProfile}
       />
     </>
   );

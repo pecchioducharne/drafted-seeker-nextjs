@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PlayCircle, Video, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
-import TypingGreeting from './TypingGreeting';
 import { useAuth } from '../../contexts/AuthContext';
 
 const videoData = [
@@ -81,9 +80,6 @@ export default function VideoHero({ major }) {
 
   return (
     <>
-      {/* Typing Greeting */}
-      <TypingGreeting firstName={profileData?.firstName || 'there'} />
-      
       <div className="liquid-glass rounded-2xl overflow-hidden">
         {/* Video Player - Full Width Hero with Navigation Arrows */}
         <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-gray-800 group">

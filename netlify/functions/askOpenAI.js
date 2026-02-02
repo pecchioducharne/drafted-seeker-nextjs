@@ -1,77 +1,51 @@
-// netlify/functions/askOpenAI.js
+const fetch = require("node-fetch");
 
-const OpenAI = require('openai');
-
-exports.handler = async (event, context) => {
-  // Only allow POST requests
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
+exports.handler = async function (event) {
   try {
-    const { systemMessage, prompt, model = 'gpt-3.5-turbo' } = JSON.parse(event.body);
+    const { systemMessage, prompt, model } = JSON.parse(event.body);
 
-    if (!prompt) {
+    // Use environment variable
+    const apiKey = process.env.OPENAI_API_KEY;
+    
+    if (!apiKey) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Prompt is required' })
+        statusCode: 500,
+        body: JSON.stringify({ error: "OPENAI_API_KEY environment variable not set" }),
       };
     }
 
-    // Initialize OpenAI client
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
-
-    // Create messages array
-    const messages = [];
-    
-    if (systemMessage) {
-      messages.push({
-        role: 'system',
-        content: systemMessage
-      });
-    }
-    
-    messages.push({
-      role: 'user',
-      content: prompt
-    });
-
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: model,
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 1000
-    });
-
-    const responseContent = completion.choices[0].message.content;
-
-    return {
-      statusCode: 200,
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: responseContent,
-        model: model
-      })
-    };
+        model: model || "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: systemMessage },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
 
+    if (!res.ok) {
+      const error = await res.text();
+      return {
+        statusCode: res.status,
+        body: JSON.stringify({ error }),
+      };
+    }
+
+    const data = await res.json();
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ content: data.choices[0].message.content }),
+    };
   } catch (error) {
-    console.error('OpenAI API Error:', error);
-    
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: 'Failed to generate response',
-        details: error.message
-      })
+      body: JSON.stringify({ error: error.message }),
     };
   }
 };

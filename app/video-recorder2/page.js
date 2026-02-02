@@ -9,6 +9,7 @@ import VideoGallery from '../../components/video/VideoGallery';
 import ScriptTipsPanel from '../../components/video/ScriptTipsPanel';
 import QuestionExplainedModal from '../../components/video/QuestionExplainedModal';
 import { ChevronRight, ChevronLeft, Sparkles, ArrowLeft, Check, HelpCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const QUESTION_NUMBER = 2;
 const TIME_LIMIT = 90000; // 90 seconds
@@ -46,9 +47,17 @@ export default function VideoRecorder2() {
     setVideoRecorded(true);
   };
 
-  const handleVideoUploaded = (url) => {
+  const handleVideoUploaded = (url, transcriptionStarted = false) => {
     console.log('Video uploaded:', url);
     setVideoUrl(url);
+    
+    // Show transcription status if started
+    if (transcriptionStarted) {
+      toast.success('Video uploaded! Transcription started in background...', {
+        duration: 4000,
+        icon: '🎤'
+      });
+    }
   };
 
   // Check if video 1 is completed

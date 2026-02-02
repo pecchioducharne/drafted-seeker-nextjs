@@ -9,6 +9,7 @@ import LoadingScreen from '@/components/shared/LoadingScreen';
 import StepEmail from '@/components/onboarding/steps/StepEmail';
 import StepUniversity from '@/components/onboarding/steps/StepUniversity';
 import StepPersonalInfo from '@/components/onboarding/steps/StepPersonalInfo';
+import StepResume from '@/components/onboarding/steps/StepResume';
 import StepPassword from '@/components/onboarding/steps/StepPassword';
 import StepReferral from '@/components/onboarding/steps/StepReferral';
 import StepSuccess from '@/components/onboarding/steps/StepSuccess';
@@ -46,6 +47,7 @@ export default function OnboardingPage() {
     { component: StepEmail, field: 'email', title: 'Email' },
     { component: StepUniversity, field: 'university', title: 'University' },
     { component: StepPersonalInfo, field: 'personalInfo', title: 'Personal Info' },
+    { component: StepResume, field: 'resume', title: 'Resume (Optional)' },
     { component: StepPassword, field: 'password', title: 'Password' },
     { component: StepReferral, field: 'referralSource', title: 'How did you hear about us?' },
     { component: StepSuccess, field: 'success', title: 'Success' },
