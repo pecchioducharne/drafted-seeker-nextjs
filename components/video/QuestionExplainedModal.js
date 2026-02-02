@@ -1,7 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
 
 const QUESTION_TIPS = {
   1: {
