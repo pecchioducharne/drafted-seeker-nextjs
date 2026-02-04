@@ -61,13 +61,20 @@ const getUniversityFavicon = (universityName) => {
 };
 
 export default function ProfileSnapshot() {
-  const { profileData, refreshProfile } = useAuth();
+  const { profileData, refreshProfile, profileLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [showSkillSelector, setShowSkillSelector] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [showResumeViewer, setShowResumeViewer] = useState(false);
   const [editedData, setEditedData] = useState(profileData || {});
   const [cultureTagsGenerating, setCultureTagsGenerating] = useState(false);
+
+  // Update editedData when profileData changes (fixes initial load issue)
+  useEffect(() => {
+    if (profileData) {
+      setEditedData(profileData);
+    }
+  }, [profileData]);
 
   // Real-time listener for culture tag generation status
   useEffect(() => {
@@ -97,8 +104,8 @@ export default function ProfileSnapshot() {
   }, [refreshProfile]);
   const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
-  // Show loading skeleton if no profile data
-  if (!profileData) {
+  // Show loading skeleton if no profile data and still loading
+  if (!profileData && profileLoading) {
     return (
       <div className="liquid-glass rounded-2xl p-4 sm:p-6 lg:p-8 animate-pulse">
         <div className="h-8 bg-white/10 rounded w-1/3 mb-4"></div>
@@ -107,6 +114,23 @@ export default function ProfileSnapshot() {
           <div className="h-4 bg-white/10 rounded w-full"></div>
           <div className="h-4 bg-white/10 rounded w-5/6"></div>
           <div className="h-4 bg-white/10 rounded w-4/6"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // If not loading but still no profile data, show error state
+  if (!profileData) {
+    return (
+      <div className="liquid-glass rounded-2xl p-4 sm:p-6 lg:p-8">
+        <div className="text-center py-8">
+          <p className="text-gray-400 mb-4">Unable to load profile data</p>
+          <button
+            onClick={() => refreshProfile()}
+            className="drafted-btn drafted-btn-primary"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
