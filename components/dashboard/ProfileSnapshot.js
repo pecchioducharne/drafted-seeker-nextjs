@@ -12,6 +12,7 @@ import RoleSelector from './RoleSelector';
 import MajorAutocomplete from '../onboarding/MajorAutocomplete';
 import YearAutocomplete from '../onboarding/YearAutocomplete';
 import ResumeUploadModal from './ResumeUploadModal';
+import ResumeViewerModal from './ResumeViewerModal';
 import CultureTags from './CultureTags';
 import CultureTagsLoader from './CultureTagsLoader';
 import { FileText } from 'lucide-react';
@@ -64,6 +65,7 @@ export default function ProfileSnapshot() {
   const [isEditing, setIsEditing] = useState(false);
   const [showSkillSelector, setShowSkillSelector] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [showResumeViewer, setShowResumeViewer] = useState(false);
   const [editedData, setEditedData] = useState(profileData || {});
   const [cultureTagsGenerating, setCultureTagsGenerating] = useState(false);
 
@@ -95,7 +97,20 @@ export default function ProfileSnapshot() {
   }, [refreshProfile]);
   const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
-  if (!profileData) return null;
+  // Show loading skeleton if no profile data
+  if (!profileData) {
+    return (
+      <div className="liquid-glass rounded-2xl p-4 sm:p-6 lg:p-8 animate-pulse">
+        <div className="h-8 bg-white/10 rounded w-1/3 mb-4"></div>
+        <div className="h-4 bg-white/10 rounded w-1/2 mb-6"></div>
+        <div className="space-y-3">
+          <div className="h-4 bg-white/10 rounded w-full"></div>
+          <div className="h-4 bg-white/10 rounded w-5/6"></div>
+          <div className="h-4 bg-white/10 rounded w-4/6"></div>
+        </div>
+      </div>
+    );
+  }
 
   const handleEditClick = () => {
     if (isEditing) {
@@ -346,20 +361,18 @@ export default function ProfileSnapshot() {
               </h3>
               {profileData.resume ? (
                 <div className="flex items-center gap-2">
-                  <a 
-                    href={profileData.resume} 
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => setShowResumeViewer(true)}
                     className="drafted-btn drafted-btn-glass flex items-center gap-2 flex-1 justify-center"
                   >
                     <FileText className="w-4 h-4" />
                     View Resume
-                  </a>
+                  </button>
                   <button 
                     onClick={() => setShowResumeModal(true)}
                     className="drafted-btn drafted-btn-ghost text-sm px-4"
                   >
-                    Replace
+                    Update
                   </button>
                 </div>
               ) : (

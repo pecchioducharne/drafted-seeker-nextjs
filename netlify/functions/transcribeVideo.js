@@ -42,99 +42,68 @@ exports.handler = async function (event) {
       };
     }
 
-    // Use environment variable for AssemblyAI API key
-    const apiKey = process.env.ASSEMBLYAI_API_KEY;
+    // Use environment variable for Deepgram API key
+    const apiKey = process.env.DEEPGRAM_API_KEY;
     
     if (!apiKey) {
       return {
         statusCode: 500,
         headers: { "Access-Control-Allow-Origin": allowedOrigin },
-        body: JSON.stringify({ error: "ASSEMBLYAI_API_KEY environment variable not set" }),
+        body: JSON.stringify({ error: "DEEPGRAM_API_KEY environment variable not set" }),
       };
     }
 
-    console.log('🎤 Starting transcription for video URL:', videoURL);
+    console.log('🎤 Starting Deepgram transcription for video URL:', videoURL);
 
-    // Submit the audio URL to AssemblyAI for transcription
-    const response = await fetch('https://api.assemblyai.com/v2/transcript', {
+    // Submit the audio URL to Deepgram for transcription
+    // Using Nova-2 model with smart formatting for better accuracy
+    const response = await fetch('https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&punctuate=true&diarize=false', {
       method: 'POST',
       headers: {
-        authorization: apiKey,
+        'Authorization': `Token ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        audio_url: videoURL,
+        url: videoURL,
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('❌ AssemblyAI submission failed:', error);
+      console.error('❌ Deepgram transcription failed:', error);
       return {
         statusCode: response.status,
         headers: { "Access-Control-Allow-Origin": allowedOrigin },
-        body: JSON.stringify({ error: `AssemblyAI error: ${error}` }),
+        body: JSON.stringify({ error: `Deepgram error: ${error}` }),
       };
     }
 
     const data = await response.json();
-    const transcriptId = data.id;
+    
+    // Extract transcript from Deepgram response
+    // Deepgram returns: results.channels[0].alternatives[0].transcript
+    const transcript = data?.results?.channels?.[0]?.alternatives?.[0]?.transcript;
 
-    console.log('✅ Transcription job submitted with ID:', transcriptId);
-
-    // Poll for the transcription result (max 10 minutes)
-    const maxPollingTime = 10 * 60 * 1000; // 10 minutes
-    const pollingInterval = 5000; // 5 seconds
-    const startTime = Date.now();
-
-    while (Date.now() - startTime < maxPollingTime) {
-      const result = await fetch(`https://api.assemblyai.com/v2/transcript/${transcriptId}`, {
-        headers: {
-          authorization: apiKey,
-        },
-      });
-
-      if (!result.ok) {
-        const error = await result.text();
-        console.error('❌ AssemblyAI polling failed:', error);
-        return {
-          statusCode: result.status,
-          headers: { "Access-Control-Allow-Origin": allowedOrigin },
-          body: JSON.stringify({ error: `AssemblyAI polling error: ${error}` }),
-        };
-      }
-
-      const resultData = await result.json();
-      
-      if (resultData.status === 'completed') {
-        console.log('✅ Transcription completed successfully');
-        return {
-          statusCode: 200,
-          headers: { "Access-Control-Allow-Origin": allowedOrigin },
-          body: JSON.stringify({ 
-            transcript: resultData.text,
-            transcriptId: transcriptId 
-          }),
-        };
-      } else if (resultData.status === 'failed') {
-        console.error('❌ Transcription failed:', resultData.error);
-        return {
-          statusCode: 500,
-          headers: { "Access-Control-Allow-Origin": allowedOrigin },
-          body: JSON.stringify({ error: 'Transcription failed' }),
-        };
-      }
-
-      // Wait before polling again
-      await new Promise(resolve => setTimeout(resolve, pollingInterval));
+    if (!transcript) {
+      console.error('❌ No transcript in Deepgram response:', JSON.stringify(data));
+      return {
+        statusCode: 500,
+        headers: { "Access-Control-Allow-Origin": allowedOrigin },
+        body: JSON.stringify({ error: 'No transcript in response' }),
+      };
     }
 
-    // Timeout
-    console.error('❌ Transcription timed out');
+    console.log('✅ Deepgram transcription completed successfully');
+    console.log('📝 Transcript length:', transcript.length, 'characters');
+
     return {
-      statusCode: 408,
+      statusCode: 200,
       headers: { "Access-Control-Allow-Origin": allowedOrigin },
-      body: JSON.stringify({ error: 'Transcription timed out' }),
+      body: JSON.stringify({ 
+        transcript: transcript,
+        provider: 'deepgram',
+        model: 'nova-2'
+      }),
     };
 
   } catch (error) {

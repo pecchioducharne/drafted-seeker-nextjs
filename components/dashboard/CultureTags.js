@@ -39,19 +39,17 @@ export default function CultureTags({ tags = [], descriptions = [] }) {
               transition={{ delay: index * 0.1, duration: 0.3 }}
               onClick={() => handleTagClick(tag, descriptions[index])}
               className="
-                bg-gradient-to-br from-purple-600/90 to-purple-500/90
-                text-white px-4 py-2 rounded-2xl
+                bg-gradient-to-r from-[#8B5CF6] to-[#6366F1]
+                text-white px-4 py-2 rounded-full
                 text-sm font-semibold cursor-pointer
                 transition-all duration-300
-                border border-purple-600/40
                 hover:translate-y-[-2px]
                 hover:brightness-110
-                shadow-[0_0_10px_rgba(147,51,234,0.3),inset_0_0_5px_rgba(255,255,255,0.2)]
-                hover:shadow-[0_0_15px_rgba(147,51,234,0.6),0_0_30px_rgba(168,85,247,0.4)]
+                hover:shadow-lg
                 active:scale-95
               "
               style={{
-                textShadow: '0 0 5px rgba(255, 255, 255, 0.5)'
+                boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.4)'
               }}
             >
               {tag}

@@ -89,16 +89,6 @@ export default function CultureTagModal({ isOpen, tag, description, onClose }) {
                     {description}
                   </p>
                 </div>
-
-                {/* Footer */}
-                <div className="mt-8 pt-6 border-t border-white/10">
-                  <button
-                    onClick={onClose}
-                    className="w-full drafted-btn drafted-btn-primary py-3"
-                  >
-                    Got it
-                  </button>
-                </div>
               </div>
 
               {/* Decorative glow effect */}
