@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { LinkedIn, GitHub, Language, Email, Check } from '@mui/icons-material';
 import { Briefcase, GraduationCap, MapPin, Calendar, Edit2, X, Copy, Check as LucideCheck } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../../lib/firebase';
 import toast from 'react-hot-toast';
 import SkillSelector from './SkillSelector';
@@ -13,6 +13,7 @@ import MajorAutocomplete from '../onboarding/MajorAutocomplete';
 import YearAutocomplete from '../onboarding/YearAutocomplete';
 import ResumeUploadModal from './ResumeUploadModal';
 import CultureTags from './CultureTags';
+import CultureTagsLoader from './CultureTagsLoader';
 import { FileText } from 'lucide-react';
 
 // Get university favicon
@@ -64,6 +65,34 @@ export default function ProfileSnapshot() {
   const [showSkillSelector, setShowSkillSelector] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
   const [editedData, setEditedData] = useState(profileData || {});
+  const [cultureTagsGenerating, setCultureTagsGenerating] = useState(false);
+
+  // Real-time listener for culture tag generation status
+  useEffect(() => {
+    if (!auth.currentUser?.email) return;
+
+    const userEmail = auth.currentUser.email.toLowerCase();
+    const userDocRef = doc(db, 'drafted-accounts', userEmail);
+
+    // Subscribe to real-time updates
+    const unsubscribe = onSnapshot(userDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        const isGenerating = data.cultureTagsGenerating || false;
+        
+        setCultureTagsGenerating(isGenerating);
+        
+        // If generation just completed, refresh profile to show new tags
+        if (!isGenerating && data.cultureTagsLastGenerated) {
+          refreshProfile();
+        }
+      }
+    }, (error) => {
+      console.error('Error listening to culture tag generation:', error);
+    });
+
+    return () => unsubscribe();
+  }, [refreshProfile]);
   const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
   if (!profileData) return null;
@@ -455,42 +484,75 @@ export default function ProfileSnapshot() {
             </div>
 
             {/* Culture Tags */}
-            {profileData?.culture?.cultureTags && profileData.culture.cultureTags.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                    Culture Tags
-                  </h3>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                  Culture Tags
+                </h3>
+                {!cultureTagsGenerating && profileData?.culture?.cultureTags && profileData.culture.cultureTags.length > 0 && (
                   <button
                     onClick={async () => {
-                      const hasAllVideos = profileData.video1 && profileData.video2 && profileData.video3;
-                      if (!hasAllVideos) {
-                        toast.error('Complete all 3 videos to generate culture tags');
+                      const hasAnyTranscript = profileData.transcripts && profileData.transcripts.some(t => t);
+                      if (!hasAnyTranscript) {
+                        toast.error('Record at least one video to generate culture tags');
                         return;
                       }
                       
-                      const loadingToast = toast.loading('Regenerating culture tags...');
                       try {
+                        // Set generating flag
+                        const userDocRef = doc(db, 'drafted-accounts', auth.currentUser.email.toLowerCase());
+                        await updateDoc(userDocRef, {
+                          cultureTagsGenerating: true,
+                          cultureTagsGeneratingAt: new Date().toISOString()
+                        });
+
                         const { default: generateCultureTags } = await import('../../lib/services/CultureTagService');
                         await generateCultureTags(auth.currentUser.email.toLowerCase());
-                        await refreshProfile();
-                        toast.success('Culture tags regenerated!', { id: loadingToast });
+                        
+                        // Clear generating flag
+                        await updateDoc(userDocRef, {
+                          cultureTagsGenerating: false,
+                          cultureTagsLastGenerated: new Date().toISOString()
+                        });
+                        
+                        toast.success('Culture tags regenerated!');
                       } catch (error) {
                         console.error('Failed to regenerate culture tags:', error);
-                        toast.error('Failed to regenerate culture tags', { id: loadingToast });
+                        
+                        // Clear flag on error
+                        try {
+                          const userDocRef = doc(db, 'drafted-accounts', auth.currentUser.email.toLowerCase());
+                          await updateDoc(userDocRef, {
+                            cultureTagsGenerating: false,
+                            cultureTagsError: error.message
+                          });
+                        } catch (flagError) {
+                          console.error('Failed to clear flag:', flagError);
+                        }
+                        
+                        toast.error('Failed to regenerate culture tags');
                       }
                     }}
                     className="text-xs text-drafted-green hover:text-drafted-emerald transition-colors font-medium"
                   >
                     Regenerate
                   </button>
-                </div>
+                )}
+              </div>
+              
+              {cultureTagsGenerating ? (
+                <CultureTagsLoader />
+              ) : profileData?.culture?.cultureTags && profileData.culture.cultureTags.length > 0 ? (
                 <CultureTags
                   tags={profileData.culture.cultureTags}
                   descriptions={profileData.culture.cultureDescriptions}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm">Record videos to generate your culture tags!</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
