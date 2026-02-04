@@ -584,6 +584,13 @@ export default function ProfileSnapshot() {
         onClose={() => setShowResumeModal(false)}
         onUploadComplete={refreshProfile}
       />
+
+      {/* Resume Viewer Modal */}
+      <ResumeViewerModal
+        isOpen={showResumeViewer}
+        resumeUrl={profileData?.resume}
+        onClose={() => setShowResumeViewer(false)}
+      />
     </>
   );
 }

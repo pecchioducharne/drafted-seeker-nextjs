@@ -530,7 +530,8 @@ export default function RecruiterPage() {
                 {paginatedCompanies.map((company) => (
                   <div
                     key={company.id}
-                    className="drafted-card hover:scale-[1.02] transition-transform duration-200"
+                    onClick={() => company.Email && handleNudge(company)}
+                    className={`drafted-card hover:scale-[1.02] transition-transform duration-200 ${company.Email ? 'cursor-pointer' : ''}`}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-start gap-3 flex-1">
@@ -608,7 +609,10 @@ export default function RecruiterPage() {
                       {company.Email && (
                         <button
                           className="flex-1 drafted-btn drafted-btn-primary text-sm py-2 flex items-center justify-center gap-2"
-                          onClick={() => handleNudge(company)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleNudge(company);
+                          }}
                         >
                           <Mail className="w-4 h-4" />
                           Nudge

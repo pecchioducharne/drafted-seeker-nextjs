@@ -45,22 +45,35 @@ export default function ResumeUploadModal({ isOpen, onClose, onUploadComplete })
 
       console.log('✅ Resume uploaded to Storage:', downloadURL);
 
-      // Update Firestore with new resume URL and experience data
+      // Update Firestore with new resume URL and all parsed data
       const userDocRef = doc(db, 'drafted-accounts', user.email.toLowerCase());
       const updateData = {
         resume: downloadURL,
       };
 
-      // Add experience array if parsed from resume
-      if (parsedData?.experience && parsedData.experience.length > 0) {
-        updateData.experience = parsedData.experience;
+      // Add all parsed data from resume (experience, skills, etc.)
+      if (parsedData) {
+        if (parsedData.experience && parsedData.experience.length > 0) {
+          updateData.experience = parsedData.experience;
+        }
+        if (parsedData.skills && parsedData.skills.length > 0) {
+          updateData.skills = parsedData.skills;
+          console.log('✅ Auto-assigned skills from resume:', parsedData.skills);
+        }
+        // Optionally update other fields if they're better than existing
+        if (parsedData.linkedInURL && parsedData.linkedInURL.length > 0) {
+          updateData.linkedInURL = parsedData.linkedInURL;
+        }
+        if (parsedData.gitHubURL && parsedData.gitHubURL.length > 0) {
+          updateData.gitHubURL = parsedData.gitHubURL;
+        }
       }
 
       await updateDoc(userDocRef, updateData);
 
-      console.log('✅ Firestore updated with resume data');
+      console.log('✅ Firestore updated with resume data and auto-assigned fields');
 
-      toast.success('Resume uploaded successfully!', { id: uploadingToast });
+      toast.success('Resume uploaded successfully! Skills auto-assigned.', { id: uploadingToast });
       
       // Call the callback to refresh profile data
       if (onUploadComplete) {

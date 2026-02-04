@@ -56,7 +56,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
 
   const companyName = company?.Company || company?.name || 'Company';
   const companyEmail = company?.Email ? (typeof company.Email === 'string' ? company.Email : String(company.Email)).split(',')[0].trim() : null;
-  const isYC = company?.['Y Combinator'] === 'Yes' || company?.yc === 'Yes';
+  const isYC = company?.source === 'yc';
 
   useEffect(() => {
     if (isOpen && company && userData) {
