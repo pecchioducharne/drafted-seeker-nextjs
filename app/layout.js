@@ -14,8 +14,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: 'drafted. - Video Resume Platform',
-  description: 'Stand out with a 30-second video resume. Connect with thousands of recruiters.',
+  title: 'Drafted',
+  description: 'Every great hire begins with a great story.',
 };
 
 export default function RootLayout({ children }) {
