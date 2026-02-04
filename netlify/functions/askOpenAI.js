@@ -1,6 +1,27 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event) {
+  // Allow from frontend (production and local dev)
+  const origin = event.headers.origin;
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://candidate.joindrafted.com",
+    "https://draftedseeker.netlify.app"
+  ];
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": allowedOrigin,
+        "Access-Control-Allow-Headers": "content-type",
+        "Access-Control-Allow-Methods": "POST",
+      },
+      body: "",
+    };
+  }
+
   try {
     const { systemMessage, prompt, model } = JSON.parse(event.body);
 
@@ -10,6 +31,7 @@ exports.handler = async function (event) {
     if (!apiKey) {
       return {
         statusCode: 500,
+        headers: { "Access-Control-Allow-Origin": allowedOrigin },
         body: JSON.stringify({ error: "OPENAI_API_KEY environment variable not set" }),
       };
     }
@@ -33,6 +55,7 @@ exports.handler = async function (event) {
       const error = await res.text();
       return {
         statusCode: res.status,
+        headers: { "Access-Control-Allow-Origin": allowedOrigin },
         body: JSON.stringify({ error }),
       };
     }
@@ -40,11 +63,13 @@ exports.handler = async function (event) {
     const data = await res.json();
     return {
       statusCode: 200,
+      headers: { "Access-Control-Allow-Origin": allowedOrigin },
       body: JSON.stringify({ content: data.choices[0].message.content }),
     };
   } catch (error) {
     return {
       statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": allowedOrigin },
       body: JSON.stringify({ error: error.message }),
     };
   }

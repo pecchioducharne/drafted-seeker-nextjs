@@ -2,8 +2,14 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event) {
-  // Allow only from your frontend
-  const allowedOrigin = "https://candidate.joindrafted.com";
+  // Allow from frontend (production and local dev)
+  const origin = event.headers.origin;
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "https://candidate.joindrafted.com",
+    "https://draftedseeker.netlify.app"
+  ];
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
 
   if (event.httpMethod === "OPTIONS") {
     return {
