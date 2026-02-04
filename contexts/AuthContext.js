@@ -75,14 +75,15 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // Fetch profile data from Firestore
-  const fetchProfile = useCallback(async (email, forceRefresh = false) => {
+  // Fetch profile data from Firestore with retry logic
+  const fetchProfile = useCallback(async (email, forceRefresh = false, retryCount = 0) => {
     if (!email) return null;
 
     // Check cache first (unless force refresh)
     if (!forceRefresh) {
       const cached = loadCachedProfile();
       if (cached && cached.email === email.toLowerCase()) {
+        console.log('[AuthContext] Using cached profile data');
         setProfileData(cached);
         return cached;
       }
@@ -93,21 +94,34 @@ export function AuthProvider({ children }) {
 
     try {
       const lowercaseEmail = email.toLowerCase().trim();
+      console.log('[AuthContext] Fetching profile from Firestore:', lowercaseEmail);
+      
       const userDocRef = doc(db, "drafted-accounts", lowercaseEmail);
       const docSnap = await getDoc(userDocRef);
 
       if (docSnap.exists()) {
         const data = { ...docSnap.data(), email: lowercaseEmail };
+        console.log('[AuthContext] ✅ Profile loaded successfully');
         setProfileData(data);
         cacheProfile(data);
+        setProfileError(null);
         return data;
       } else {
-        console.warn('[AuthContext] No profile found for:', lowercaseEmail);
+        console.warn('[AuthContext] No profile document found for:', lowercaseEmail);
         setProfileData(null);
         return null;
       }
     } catch (error) {
-      console.error('[AuthContext] Error fetching profile:', error);
+      console.error('[AuthContext] ❌ Error fetching profile:', error);
+      
+      // Retry logic (max 3 attempts with exponential backoff)
+      if (retryCount < 3) {
+        const waitTime = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.log(`[AuthContext] Retrying in ${waitTime}ms... (attempt ${retryCount + 1}/3)`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        return fetchProfile(email, forceRefresh, retryCount + 1);
+      }
+      
       setProfileError(error.message);
       return null;
     } finally {
@@ -151,11 +165,16 @@ export function AuthProvider({ children }) {
         }
 
         // Then fetch fresh data in background (force past the cache)
+        // This ensures we always have the latest data, even if cache exists
         try {
-          const profile = await fetchProfile(currentUser.email, true);
-          console.log('[AuthContext] Profile fetched:', profile ? 'success' : 'not found');
+          const profile = await fetchProfile(currentUser.email, true, 0);
+          if (profile) {
+            console.log('[AuthContext] ✅ Profile fetched and cached');
+          } else {
+            console.warn('[AuthContext] ⚠️ No profile found in Firestore');
+          }
         } catch (err) {
-          console.error('[AuthContext] Background profile fetch failed:', err);
+          console.error('[AuthContext] ❌ Background profile fetch failed:', err);
         }
       } else {
         // User signed out - clear profile

@@ -104,33 +104,70 @@ export default function ProfileSnapshot() {
   }, [refreshProfile]);
   const [profileUrlCopied, setProfileUrlCopied] = useState(false);
 
-  // Show loading skeleton if no profile data and still loading
-  if (!profileData && profileLoading) {
-    return (
-      <div className="liquid-glass rounded-2xl p-4 sm:p-6 lg:p-8 animate-pulse">
-        <div className="h-8 bg-white/10 rounded w-1/3 mb-4"></div>
-        <div className="h-4 bg-white/10 rounded w-1/2 mb-6"></div>
-        <div className="space-y-3">
-          <div className="h-4 bg-white/10 rounded w-full"></div>
-          <div className="h-4 bg-white/10 rounded w-5/6"></div>
-          <div className="h-4 bg-white/10 rounded w-4/6"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // If not loading but still no profile data, show error state
-  if (!profileData) {
+  // ALWAYS show profile blob - use loading skeleton while data loads
+  // This ensures the section is ALWAYS visible
+  const isLoadingProfile = !profileData || profileLoading;
+  
+  if (isLoadingProfile) {
     return (
       <div className="liquid-glass rounded-2xl p-4 sm:p-6 lg:p-8">
-        <div className="text-center py-8">
-          <p className="text-gray-400 mb-4">Unable to load profile data</p>
-          <button
-            onClick={() => refreshProfile()}
-            className="drafted-btn drafted-btn-primary"
-          >
-            Retry
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+          <div className="flex-1 min-w-0 space-y-4">
+            {/* Name skeleton with shimmer effect */}
+            <div className="h-10 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite] w-2/3"></div>
+            {/* University skeleton with shimmer */}
+            <div className="h-6 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite] w-1/2" style={{ animationDelay: '0.1s' }}></div>
+          </div>
+          <div className="h-10 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite] w-24" style={{ animationDelay: '0.2s' }}></div>
+        </div>
+        
+        <div className="space-y-6 mt-6">
+          {/* Contact info skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div 
+                key={i} 
+                className="h-12 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite]"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              ></div>
+            ))}
+          </div>
+          
+          {/* Skills skeleton */}
+          <div>
+            <div className="h-6 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite] w-32 mb-3"></div>
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div 
+                  key={i} 
+                  className="h-8 w-24 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                ></div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Culture tags skeleton */}
+          <div>
+            <div className="h-6 bg-gradient-to-r from-white/10 via-white/20 to-white/10 rounded-lg animate-[shimmer_2s_ease-in-out_infinite] w-40 mb-3"></div>
+            <div className="flex flex-wrap gap-3">
+              {[1, 2, 3, 4].map(i => (
+                <div 
+                  key={i} 
+                  className="h-9 w-28 bg-gradient-to-r from-purple-600/20 via-purple-500/30 to-purple-600/20 rounded-full animate-[shimmer_2s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                ></div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Loading message */}
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center gap-3">
+            <div className="w-5 h-5 border-2 border-drafted-green/30 border-t-drafted-green rounded-full animate-spin"></div>
+            <p className="text-gray-400 text-sm">Loading your profile...</p>
+          </div>
         </div>
       </div>
     );
