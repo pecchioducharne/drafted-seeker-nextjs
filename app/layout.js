@@ -7,7 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { Poppins } from 'next/font/google';
 
 const poppins = Poppins({
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-poppins',
@@ -16,6 +16,13 @@ const poppins = Poppins({
 export const metadata = {
   title: 'Drafted',
   description: 'Every great hire begins with a great story.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.jpeg', type: 'image/jpeg' },
+    ],
+    apple: '/icon.jpeg',
+  },
 };
 
 export default function RootLayout({ children }) {
