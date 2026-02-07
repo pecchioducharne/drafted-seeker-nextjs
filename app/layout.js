@@ -18,10 +18,9 @@ export const metadata = {
   description: 'Every great hire begins with a great story.',
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/icon.jpeg', type: 'image/jpeg' },
+      { url: '/draftedTab.jpeg', type: 'image/jpeg' },
     ],
-    apple: '/icon.jpeg',
+    apple: '/draftedTab.jpeg',
   },
 };
 
