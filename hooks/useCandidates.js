@@ -43,10 +43,17 @@ export function useCandidates() {
         };
 
         const data = await fetchCandidates(filters);
-        setCandidates(data);
+
+        // Filter out test accounts
+        const filteredData = data.filter(c => {
+          const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase();
+          return fullName !== 'rodrigo pecchio' && fullName !== 'andrew kozlovski';
+        });
+
+        setCandidates(filteredData);
 
         // Calculate stats
-        const statsData = await getCandidateStats(data);
+        const statsData = await getCandidateStats(filteredData);
         setStats(statsData);
       } catch (err) {
         console.error('Error loading candidates:', err);
@@ -179,8 +186,15 @@ export function useCandidates() {
     setIsLoading(true);
     try {
       const data = await fetchCandidates({}, 10000, true); // Force refresh - fetch ALL
-      setCandidates(data);
-      const statsData = await getCandidateStats(data);
+
+      // Filter out test accounts
+      const filteredData = data.filter(c => {
+        const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase();
+        return fullName !== 'rodrigo pecchio' && fullName !== 'andrew kozlovski';
+      });
+
+      setCandidates(filteredData);
+      const statsData = await getCandidateStats(filteredData);
       setStats(statsData);
     } catch (err) {
       setError(err.message);
