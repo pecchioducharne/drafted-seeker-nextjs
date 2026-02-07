@@ -27,6 +27,9 @@ export function useCandidates() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
+  // Selection state
+  const [selectedCandidates, setSelectedCandidates] = useState(new Set());
+
   // Fetch candidates on mount
   useEffect(() => {
     async function loadCandidates() {
@@ -175,7 +178,7 @@ export function useCandidates() {
   const refresh = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await fetchCandidates({}, 2000, true); // Force refresh
+      const data = await fetchCandidates({}, 10000, true); // Force refresh - fetch ALL
       setCandidates(data);
       const statsData = await getCandidateStats(data);
       setStats(statsData);
@@ -185,6 +188,32 @@ export function useCandidates() {
       setIsLoading(false);
     }
   }, []);
+
+  // Selection handlers
+  const toggleCandidateSelection = useCallback((candidateId) => {
+    setSelectedCandidates(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(candidateId)) {
+        newSet.delete(candidateId);
+      } else {
+        newSet.add(candidateId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const selectAllFiltered = useCallback(() => {
+    const allIds = new Set(filteredCandidates.map(c => c.id));
+    setSelectedCandidates(allIds);
+  }, [filteredCandidates]);
+
+  const deselectAll = useCallback(() => {
+    setSelectedCandidates(new Set());
+  }, []);
+
+  const getSelectedCandidatesList = useCallback(() => {
+    return filteredCandidates.filter(c => selectedCandidates.has(c.id));
+  }, [filteredCandidates, selectedCandidates]);
 
   // Clear all filters
   const clearFilters = useCallback(() => {
@@ -231,6 +260,7 @@ export function useCandidates() {
     // Data
     candidates: paginatedCandidates,
     allCandidates: candidates,
+    filteredCandidates,
     filteredCount: filteredCandidates.length,
     totalCount: candidates.length,
     stats,
@@ -265,6 +295,13 @@ export function useCandidates() {
     totalPages,
     hasPrevPage,
     hasNextPage,
+
+    // Selection
+    selectedCandidates,
+    toggleCandidateSelection,
+    selectAllFiltered,
+    deselectAll,
+    getSelectedCandidatesList,
 
     // Actions
     refresh

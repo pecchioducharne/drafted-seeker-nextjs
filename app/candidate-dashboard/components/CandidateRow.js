@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 
 /**
  * CandidateRow Component
@@ -6,19 +6,49 @@ import { memo } from 'react';
  * Memoized for performance
  */
 
-function CandidateRow({ candidate, onSelect }) {
+function CandidateRow({ candidate, onSelect, isSelected, onToggleSelect }) {
+  const [emailCopied, setEmailCopied] = useState(false);
   const hasVideo1 = Boolean(candidate.video1);
   const hasVideo2 = Boolean(candidate.video2);
   const hasVideo3 = Boolean(candidate.video3);
   const videoCount = [hasVideo1, hasVideo2, hasVideo3].filter(Boolean).length;
 
+  const handleCheckboxClick = (e) => {
+    e.stopPropagation();
+    onToggleSelect?.(candidate.id);
+  };
+
+  const handleCopyEmail = async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(candidate.email);
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy email:', error);
+    }
+  };
+
   return (
     <div
-      className="p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-all
-                 border border-white/10 hover:border-purple-500/50 cursor-pointer"
+      className={`p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-all
+                 border border-white/10 hover:border-purple-500/50 cursor-pointer
+                 ${isSelected ? 'ring-2 ring-purple-500 bg-purple-500/10' : ''}`}
       onClick={() => onSelect?.(candidate)}
     >
       <div className="flex items-start justify-between gap-4">
+        {/* Checkbox */}
+        <div className="flex items-start pt-1 shrink-0">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={handleCheckboxClick}
+            onClick={handleCheckboxClick}
+            className="w-5 h-5 rounded border-gray-600 bg-white/10 text-purple-600
+                     focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+          />
+        </div>
+
         {/* Left side: Main info */}
         <div className="flex-1 min-w-0">
           {/* Name */}
@@ -26,10 +56,28 @@ function CandidateRow({ candidate, onSelect }) {
             {candidate.firstName} {candidate.lastName}
           </h3>
 
-          {/* Email */}
-          <p className="text-gray-400 text-sm mb-3 truncate">
-            {candidate.email}
-          </p>
+          {/* Email with Copy Button */}
+          <div className="flex items-center gap-2 mb-3">
+            <p className="text-gray-400 text-sm truncate">
+              {candidate.email}
+            </p>
+            <button
+              onClick={handleCopyEmail}
+              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
+              title="Copy email"
+            >
+              {emailCopied ? (
+                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              )}
+            </button>
+          </div>
 
           {/* Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">

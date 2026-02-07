@@ -9,6 +9,7 @@ import StatCards from './components/StatCards';
 import CandidateTable from './components/CandidateTable';
 import FilterPanel from './components/FilterPanel';
 import ExportButton from './components/ExportButton';
+import BulkActionsBar from './components/BulkActionsBar';
 
 export default function CandidateDashboard() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function CandidateDashboard() {
   const {
     candidates,
     allCandidates,
+    filteredCandidates,
     filteredCount,
     totalCount,
     stats,
@@ -44,8 +46,94 @@ export default function CandidateDashboard() {
     totalPages,
     hasPrevPage,
     hasNextPage,
+    selectedCandidates,
+    toggleCandidateSelection,
+    selectAllFiltered,
+    deselectAll,
+    getSelectedCandidatesList,
     refresh
   } = useCandidates();
+
+  // Bulk action handlers
+  const handleCopyEmails = async () => {
+    const selected = getSelectedCandidatesList();
+    const emails = selected.map(c => c.email).join(', ');
+    await navigator.clipboard.writeText(emails);
+  };
+
+  const handleExportSelected = () => {
+    const selected = getSelectedCandidatesList();
+    if (selected.length === 0) {
+      alert('No candidates selected');
+      return;
+    }
+
+    // Build CSV
+    const headers = [
+      'First Name',
+      'Last Name',
+      'Email',
+      'University',
+      'Major',
+      'Graduation Year',
+      'Videos Completed',
+      'Has Video 1',
+      'Has Video 2',
+      'Has Video 3',
+      'Skills',
+      'Culture Tags',
+      'LinkedIn URL',
+      'GitHub URL',
+      'Resume URL'
+    ];
+
+    const rows = selected.map(c => {
+      const videoCount = [c.video1, c.video2, c.video3].filter(Boolean).length;
+      return [
+        c.firstName || '',
+        c.lastName || '',
+        c.email || '',
+        c.university || '',
+        c.major || '',
+        c.graduationYear || '',
+        videoCount,
+        c.video1 ? 'Yes' : 'No',
+        c.video2 ? 'Yes' : 'No',
+        c.video3 ? 'Yes' : 'No',
+        c.skills?.join('; ') || '',
+        c.culture?.cultureTags?.join('; ') || '',
+        c.linkedInURL || '',
+        c.gitHubURL || '',
+        c.resume || ''
+      ];
+    });
+
+    // Escape CSV values
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replace(/"/g, '""')}"`;
+      }
+      return stringValue;
+    };
+
+    const csvContent = [
+      headers.map(escapeCSV).join(','),
+      ...rows.map(row => row.map(escapeCSV).join(','))
+    ].join('\n');
+
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `drafted-candidates-selected-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   // Protect route - redirect if not logged in
   useEffect(() => {
@@ -66,6 +154,16 @@ export default function CandidateDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Bulk Actions Bar (sticky at top when selections exist) */}
+      <BulkActionsBar
+        selectedCount={selectedCandidates.size}
+        onCopyEmails={handleCopyEmails}
+        onExportSelected={handleExportSelected}
+        onDeselectAll={deselectAll}
+        onSelectAllFiltered={selectAllFiltered}
+        filteredCount={filteredCount}
+      />
+
       {/* Header */}
       <header className="liquid-glass border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -157,6 +255,8 @@ export default function CandidateDashboard() {
               isLoading={isLoading}
               hasActiveFilters={hasActiveFilters}
               onClearFilters={clearFilters}
+              selectedCandidates={selectedCandidates}
+              onToggleSelect={toggleCandidateSelection}
               onCandidateSelect={(candidate) => {
                 console.log('Selected candidate:', candidate);
                 // TODO: Open candidate detail modal

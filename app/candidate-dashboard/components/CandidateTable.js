@@ -17,11 +17,38 @@ export default function CandidateTable({
   isLoading,
   hasActiveFilters,
   onClearFilters,
-  onCandidateSelect
+  onCandidateSelect,
+  selectedCandidates,
+  onToggleSelect
 }) {
   // Calculate display range
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, filteredCount);
+
+  // Check if all candidates on current page are selected
+  const allPageSelected = candidates.length > 0 &&
+    candidates.every(c => selectedCandidates.has(c.id));
+
+  const somePageSelected = candidates.some(c => selectedCandidates.has(c.id)) && !allPageSelected;
+
+  // Toggle all candidates on current page
+  const handleToggleAllPage = () => {
+    if (allPageSelected) {
+      // Deselect all on page
+      candidates.forEach(c => {
+        if (selectedCandidates.has(c.id)) {
+          onToggleSelect(c.id);
+        }
+      });
+    } else {
+      // Select all on page
+      candidates.forEach(c => {
+        if (!selectedCandidates.has(c.id)) {
+          onToggleSelect(c.id);
+        }
+      });
+    }
+  };
 
   // Loading skeleton
   if (isLoading) {
@@ -46,18 +73,40 @@ export default function CandidateTable({
     <div className="liquid-glass rounded-xl p-6">
       {/* Results Header */}
       <div className="flex items-center justify-between mb-6">
-        <div className="text-gray-300">
-          {filteredCount > 0 ? (
-            <>
-              Showing {startIndex.toLocaleString()} - {endIndex.toLocaleString()} of{' '}
-              <span className="font-semibold text-white">
-                {filteredCount.toLocaleString()}
-              </span>{' '}
-              candidate{filteredCount !== 1 ? 's' : ''}
-            </>
-          ) : (
-            <span className="text-gray-400">No candidates found</span>
+        <div className="flex items-center gap-4">
+          {/* Select All Checkbox */}
+          {candidates.length > 0 && (
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={allPageSelected}
+                ref={input => {
+                  if (input) input.indeterminate = somePageSelected;
+                }}
+                onChange={handleToggleAllPage}
+                className="w-5 h-5 rounded border-gray-600 bg-white/10 text-purple-600
+                         focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer"
+                title={allPageSelected ? 'Deselect all on page' : 'Select all on page'}
+              />
+              <span className="text-gray-400 text-sm">
+                {allPageSelected ? 'All selected' : 'Select all'}
+              </span>
+            </div>
           )}
+
+          <div className="text-gray-300">
+            {filteredCount > 0 ? (
+              <>
+                Showing {startIndex.toLocaleString()} - {endIndex.toLocaleString()} of{' '}
+                <span className="font-semibold text-white">
+                  {filteredCount.toLocaleString()}
+                </span>{' '}
+                candidate{filteredCount !== 1 ? 's' : ''}
+              </>
+            ) : (
+              <span className="text-gray-400">No candidates found</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -92,6 +141,8 @@ export default function CandidateTable({
                 key={candidate.id}
                 candidate={candidate}
                 onSelect={onCandidateSelect}
+                isSelected={selectedCandidates.has(candidate.id)}
+                onToggleSelect={onToggleSelect}
               />
             ))}
           </div>
