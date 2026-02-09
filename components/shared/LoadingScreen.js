@@ -9,7 +9,7 @@ const LoadingScreen = ({ message = "Loading your profile..." }) => {
       <div className="relative z-10 flex flex-col items-center gap-8">
         <div className="relative">
           <div className="absolute inset-0 bg-drafted-green/20 blur-3xl rounded-full"></div>
-          <div className="relative text-6xl font-bold">
+          <div className="relative text-6xl font-bold" style={{ fontFamily: 'var(--font-poppins), Poppins, sans-serif', fontWeight: 700 }}>
             <span className="text-white">drafted</span>
             <span className="text-drafted-green">.</span>
           </div>
