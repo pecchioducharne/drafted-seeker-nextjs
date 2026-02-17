@@ -151,6 +151,11 @@ export default function VideoHero({ major }) {
               <Video className="w-5 h-5" />
               {currentVideo === 0 ? "Start Your Story" : "Record This One"}
             </button>
+            {profileData && !currentVideoUrl && (
+              <p className="text-blue-400 text-xs mt-4 max-w-md">
+                Note: If you just recorded a video, it may take a few moments to appear here.
+              </p>
+            )}
           </div>
         )}
       </div>

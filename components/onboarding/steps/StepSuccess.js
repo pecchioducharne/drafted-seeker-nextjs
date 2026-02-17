@@ -237,10 +237,21 @@ export default function StepSuccess({ data, isCreatingAccount, setIsCreatingAcco
             Your account has been created successfully
           </motion.p>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
+            className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 max-w-md mx-auto"
+          >
+            <p className="text-blue-400 text-sm">
+              Your video recordings will appear on your dashboard shortly. Video processing may take a few moments.
+            </p>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
             className="text-green-400 text-sm"
           >
             Redirecting to your dashboard...

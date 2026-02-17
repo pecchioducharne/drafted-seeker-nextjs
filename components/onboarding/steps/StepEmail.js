@@ -34,6 +34,25 @@ export default function StepEmail({ data, onNext }) {
     }
   };
 
+  const matchEmailDomainWithUniversity = async (email) => {
+    try {
+      const response = await fetch(
+        'https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json'
+      );
+      const universities = await response.json();
+
+      const emailDomain = email.split('@')[1];
+      const matchedUniversity = universities.find((university) => {
+        return university.domains.includes(emailDomain);
+      });
+
+      return matchedUniversity;
+    } catch (error) {
+      console.error('Error matching email domain with university:', error);
+      return null;
+    }
+  };
+
   const handleNext = async () => {
     setError('');
     
@@ -61,8 +80,12 @@ export default function StepEmail({ data, onNext }) {
         return;
       }
 
-      // Email is valid and doesn't exist - proceed
-      onNext({ email: email.toLowerCase() });
+      const matchedUniversity = await matchEmailDomainWithUniversity(email);
+      
+      onNext({ 
+        email: email.toLowerCase(),
+        matchedUniversity: matchedUniversity 
+      });
     } catch (error) {
       console.error('Error:', error);
       setError('Something went wrong. Please try again.');

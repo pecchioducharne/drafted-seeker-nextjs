@@ -6,6 +6,7 @@ import {
   RefreshCw, Upload, Check, AlertCircle, Play, Loader2 
 } from 'lucide-react';
 import useVideoRecorder from '../../hooks/useVideoRecorder';
+import toast from 'react-hot-toast';
 
 /**
  * DraftedVideoRecorder - Beautiful video recording component
@@ -65,7 +66,6 @@ export default function DraftedVideoRecorder({
     setUploadError(null);
     
     try {
-      // Dynamically import upload service to avoid SSR issues
       const { uploadVideoAndSave } = await import('../../lib/video/uploadService');
       const result = await uploadVideoAndSave(
         recordedBlob,
@@ -74,7 +74,23 @@ export default function DraftedVideoRecorder({
         (progress) => setUploadProgress(progress)
       );
       
-      onVideoUploaded?.(result.url);
+      toast.success('Video saved successfully!', {
+        duration: 4000,
+        icon: '✅',
+        style: {
+          background: '#10b981',
+          color: '#fff',
+        }
+      });
+      
+      if (result.transcriptionStarted) {
+        toast('Transcription started in the background...', {
+          duration: 3000,
+          icon: '🎤',
+        });
+      }
+      
+      onVideoUploaded?.(result.url, result.transcriptionStarted);
       setIsUploading(false);
     } catch (err) {
       console.error('Upload failed:', err);

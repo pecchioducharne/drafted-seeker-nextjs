@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Search, Loader2 } from 'lucide-react';
 import AsyncSelect from 'react-select/async';
@@ -81,6 +81,7 @@ export default function StepUniversity({ data, onNext, onBack }) {
   const [customUniversity, setCustomUniversity] = useState(data.customUniversity || '');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [error, setError] = useState('');
+  const [isAutoFilled, setIsAutoFilled] = useState(false);
   const customInputRef = useRef(null);
 
   useEffect(() => {
@@ -89,7 +90,30 @@ export default function StepUniversity({ data, onNext, onBack }) {
     }
   }, [showCustomInput]);
 
-  const loadUniversities = async (inputValue) => {
+  useEffect(() => {
+    if (data.matchedUniversity && !university) {
+      const autoFilledUniversity = {
+        value: data.matchedUniversity.name,
+        label: data.matchedUniversity.name
+      };
+      setUniversity(autoFilledUniversity);
+      setIsAutoFilled(true);
+    }
+  }, [data.matchedUniversity]);
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return (...args) => {
+      return new Promise((resolve) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          resolve(func(...args));
+        }, wait);
+      });
+    };
+  };
+
+  const fetchUniversities = async (inputValue) => {
     if (!inputValue || inputValue.length < 2) {
       return [];
     }
@@ -104,7 +128,6 @@ export default function StepUniversity({ data, onNext, onBack }) {
         label: university.school.name,
       }));
 
-      // Sort by Levenshtein distance for relevance
       universities.sort((a, b) => {
         const distanceA = Levenshtein.get(a.label.toLowerCase(), inputValue.toLowerCase());
         const distanceB = Levenshtein.get(b.label.toLowerCase(), inputValue.toLowerCase());
@@ -119,6 +142,11 @@ export default function StepUniversity({ data, onNext, onBack }) {
       ];
     }
   };
+
+  const loadUniversities = useCallback(
+    debounce(fetchUniversities, 500),
+    []
+  );
 
   const handleNext = () => {
     setError('');
@@ -162,7 +190,7 @@ export default function StepUniversity({ data, onNext, onBack }) {
         transition={{ delay: 0.1 }}
         className="text-gray-400 text-lg mb-12"
       >
-        Start typing your university name
+        {isAutoFilled ? 'We found your university from your email' : 'Start typing your university name'}
       </motion.p>
 
       <div className="space-y-6">
@@ -193,6 +221,15 @@ export default function StepUniversity({ data, onNext, onBack }) {
                 />
               </div>
             </div>
+            {isAutoFilled && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-green-400 text-sm mt-2 ml-10"
+              >
+                Pre-filled from your email domain. You can change it if needed.
+              </motion.p>
+            )}
             {error && (
               <motion.p
                 initial={{ opacity: 0, y: -10 }}

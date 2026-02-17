@@ -17,7 +17,10 @@ export default function StepPassword({ data, onNext, onBack }) {
   }, []);
 
   const passwordRequirements = [
-    { label: 'At least 6 characters', met: password.length >= 6 },
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'Contains uppercase letter', met: /[A-Z]/.test(password) },
+    { label: 'Contains lowercase letter', met: /[a-z]/.test(password) },
+    { label: 'Contains number', met: /[0-9]/.test(password) },
     { label: 'Passwords match', met: password && confirmPassword && password === confirmPassword }
   ];
 
@@ -26,8 +29,14 @@ export default function StepPassword({ data, onNext, onBack }) {
     
     if (!password) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/[a-z]/.test(password)) {
+      newErrors.password = 'Password must contain at least one lowercase letter';
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = 'Password must contain at least one number';
     }
     
     if (!confirmPassword) {
@@ -46,11 +55,18 @@ export default function StepPassword({ data, onNext, onBack }) {
     }
   };
 
+  const isPasswordValid = () => {
+    return password.length >= 8 && 
+           /[A-Z]/.test(password) && 
+           /[a-z]/.test(password) && 
+           /[0-9]/.test(password);
+  };
+
   const handleKeyPress = (e, field) => {
     if (e.key === 'Enter') {
-      if (field === 'password' && password.length >= 6) {
+      if (field === 'password' && isPasswordValid()) {
         document.querySelector('[data-confirm-password]')?.focus();
-      } else if (field === 'confirm' && password === confirmPassword && password.length >= 6) {
+      } else if (field === 'confirm' && password === confirmPassword && isPasswordValid()) {
         handleNext();
       }
     }
@@ -202,7 +218,7 @@ export default function StepPassword({ data, onNext, onBack }) {
         
         <button
           onClick={handleNext}
-          disabled={!password || !confirmPassword || password.length < 6 || password !== confirmPassword}
+          disabled={!password || !confirmPassword || !isPasswordValid() || password !== confirmPassword}
           className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold px-8 py-4 rounded-xl text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 inline-flex items-center gap-2"
         >
           Continue
