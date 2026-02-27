@@ -25,7 +25,7 @@ const generateLinkedInDM = (userData, companyName) => {
   const gitHubURL = userData?.gitHubURL || '';
   const resume = userData?.resume || '';
   
-  const profileUrl = email ? `https://candidate.joindrafted.com/candidate/${email}` : '';
+  const profileUrl = email ? `https://recruiter.joindrafted.com/profile/${email}` : '';
 
   let linkedInDM = `Hi! I'm ${firstName}, a ${major} grad from ${university}. I'm interested in opportunities at ${companyName}.\n\n`;
   linkedInDM += `I've created a brief video resume with AI-generated culture tags showing how I might fit at ${companyName}. Please check out my Drafted profile: ${profileUrl}\n\n`;
@@ -82,7 +82,7 @@ export default function NudgeModal({ isOpen, onClose, company, userData, onEmail
   };
 
   const handleCopyProfile = () => {
-    const profileLink = `https://candidate.joindrafted.com/candidate/${userData.email}`;
+    const profileLink = `https://recruiter.joindrafted.com/profile/${userData.email}`;
     navigator.clipboard.writeText(profileLink);
     setShowProfileCopied(true);
     setTimeout(() => setShowProfileCopied(false), 2000);

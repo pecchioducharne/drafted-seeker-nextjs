@@ -235,7 +235,7 @@ export default function ProfileSnapshot() {
               </h1>
               <button
                 onClick={() => {
-                  const profileUrl = `https://candidate.joindrafted.com/candidate/${profileData.email}`;
+                  const profileUrl = `https://recruiter.joindrafted.com/profile/${profileData.email}`;
                   navigator.clipboard.writeText(profileUrl);
                   setProfileUrlCopied(true);
                   setTimeout(() => setProfileUrlCopied(false), 2000);

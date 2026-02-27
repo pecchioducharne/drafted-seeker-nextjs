@@ -44,7 +44,7 @@ import linkedinWhite from '../../public/linkedin-white.png';
    const openLinkedInShare = () => {
      const email = auth.currentUser?.email?.toLowerCase();
      if (!email) return;
-     const profileLink = `https://candidate.joindrafted.com/candidate/${email}`;
+     const profileLink = `https://recruiter.joindrafted.com/profile/${email}`;
      const message =
        `Hi everyone! 👋\n\n` +
        `I'm excited to share my Drafted profile, a platform where I created a video resume to showcase my skills, experiences, and personality in a whole new way.\n\n` +
@@ -202,7 +202,7 @@ import linkedinWhite from '../../public/linkedin-white.png';
            onClick={() => {
              const email = auth.currentUser?.email?.toLowerCase();
              if (!email) return;
-             const profileUrl = `https://candidate.joindrafted.com/candidate/${email}`;
+             const profileUrl = `https://recruiter.joindrafted.com/profile/${email}`;
              navigator.clipboard.writeText(profileUrl);
              setProfileUrlCopied(true);
              setTimeout(() => setProfileUrlCopied(false), 2000);

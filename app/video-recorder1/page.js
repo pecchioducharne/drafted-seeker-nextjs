@@ -62,7 +62,7 @@ export default function VideoRecorder1() {
     if (profileData?.sharedOnLinkedIn) return;
 
     const email = user.email.toLowerCase();
-    const profileLink = `https://candidate.joindrafted.com/candidate/${email}`;
+    const profileLink = `https://recruiter.joindrafted.com/profile/${email}`;
     const message =
       `Hi everyone! 👋\n\n` +
       `I'm excited to share my Drafted profile, a platform where I created a video resume to showcase my skills, experiences, and personality in a whole new way.\n\n` +

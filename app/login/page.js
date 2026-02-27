@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import Lottie from "react-lottie";
 import astronautAnimation from "../../public/astronaut.json";
 import { useUploadingContext } from "../../contexts/UploadingContext";
-import LoadingScreen from "../../components/shared/LoadingScreen";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -87,6 +86,7 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
@@ -96,7 +96,6 @@ const Login = () => {
     } catch (error) {
       console.error("Error signing in:", error);
       toast.error(getFirebaseErrorMessage(error.code));
-    } finally {
       setIsLoading(false);
     }
   };
@@ -115,10 +114,6 @@ const Login = () => {
       toast.error(getFirebaseErrorMessage(error.code));
     }
   };
-
-  if (isLoading) {
-    return <LoadingScreen message="Signing you in..." />;
-  }
 
   return (
     <div className="drafted-background relative min-h-screen">
@@ -190,9 +185,20 @@ const Login = () => {
             <div className="space-y-3 mb-6">
               <button
                 type="submit"
-                className="w-full drafted-btn drafted-btn-primary drafted-btn-lg font-bold"
+                disabled={isLoading}
+                className="w-full drafted-btn drafted-btn-primary drafted-btn-lg font-bold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Login
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Signing in...
+                  </>
+                ) : (
+                  'Login'
+                )}
               </button>
               
               <button
